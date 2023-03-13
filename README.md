@@ -2,7 +2,7 @@
 
 ## Notice
 
-This is a proof of concept application to demonstrate a principal in the architecture of parsing. It does not have a framework and has not been written to be efficient or to production standards.
+This is a proof of concept application to demonstrate a principal in the architecture of parsing. It does not have a framework and has not been written to be efficient or to production standards. A simple efficiency improvement would be to use Hyperscan to match the table of regex patterns, then on a correct match, either use `PCR2` or `RE2`.
 
 ## Terminology
 
@@ -43,8 +43,6 @@ The rule definition in `rules/CheckPoint/CheckPoint.yaml` is a rule that
 2. extracts fields form the message
 
 It differentiates based on the value of the field `action` in two sub patterns that assert the events `CheckPoint Accepted` and `CheckPoint Rejected`.
-
-Conceptually, rule structure is hierarchical in line with ideas put forward by [Guy Duchatelet​](gduchatelet@alertlogic.com) in his [Proposed hierarchical content language](https://alertlogic.atlassian.net/wiki/spaces/DPT/pages/3332964353/24+03+2022+-+Parser+Tree+approach+discussion#Proposed-hierarchical-content-language-(link)%3A).
 
 Rules are expressed such that a rule can either
 
