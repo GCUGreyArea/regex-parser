@@ -7,12 +7,10 @@
 #include <libParser.h>
 
 TEST(testYAML,testYAMLFileCanBeRead) {
-    std::ifstream ifs("resources/test.yaml");
+    std::ifstream ifs("test/resources/test.yaml");
     std::string content( (std::istreambuf_iterator<char>(ifs) ),
                        (std::istreambuf_iterator<char>()    ) );
 
-
-    // std::cout << content << std::endl;
 
     ASSERT_TRUE(content != "");
 }
@@ -35,7 +33,7 @@ TEST(testYAML,testYAMLFileIsLoaded) {
         rule_name:\"Outbound access\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; rule_uid:\"4eb09b29-ccc2-4374-b33a-e66660e3916d\"; nat_addtnl_rulenum:\"0\"; nat_rulenum:\"400\"; \
         product:\"VPN-1 & FireWall-1\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\"; src:\"<IP>\"; xlatedport:\"0\"; xlatedst:\"<IP>\"; xlatesport:\"28650\"; xlatesrc:\"<IP>\"]";
 
-    YamlFile fl("resources/test.yaml");
+    YamlFile fl("test/resources/test.yaml");
 
     fl.readFile();
 

@@ -16,9 +16,17 @@ Fields are represented by individual regex patterns, and the pattern groups thes
 
 If a property is declared in a pattern, and the pattern ios then inherited, the property is also inherited and will be asserted and triggered if the pattern matches.
 
-The parser used `hyperscan` to identify that an anchor pattern matches, then uses the index from that to try the rule. It will asses the more complex patterns first, then on failure fall back to less complex ones.
+The parser uses `hyperscan` to identify that an anchor pattern matches, then uses the index from that to try the rule. It will asses the more complex patterns first, then on failure fall back to less complex ones. A massive efficiency gain could be created by using hyprescan to match the entire pattern, then scheduling the RE2 or PCRE2 to extract the tokens.
 
 Conditional logic and properties are only evaluated one a pattern has matched.
+
+### Unit tests
+
+unite tests can be run by executing the command 
+
+```shell
+$ ./test/build/test_parser
+```
 
 ## Build requirements
 

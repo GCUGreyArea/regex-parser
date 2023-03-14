@@ -8,6 +8,9 @@ BENCHDIR   = benchmark
 LIBDIR     = lib
 DOXYDIR	   = docs
 BUILD      = build
+DEP		   = dependancies
+VERSION    = v1.13.0
+DEP        = dependancies
 
 TESTTARGET = $(TESTDIR)/$(BUILD)/test_$(TARGET)
 BNCTARGET  = $(BENCHDIR)/$(BUILD)/benchmark_$(TARGET)
@@ -18,29 +21,55 @@ SRC = $(shell find src -name '*.cpp')
 
 OBJ := $(patsubst %.cpp,$(BUILD)/%.o,$(SRC))
 
+INC = -I$(LIBDIR)/src  -I$(PDW)/$(DEP)/gtest/googletest/include
+
 CC       = cc
 CXX      = c++
-CFLAGS   = -std=c11 -Wall -g -fsanitize=address -I$(LIBDIR)/src
-CXXFLAGS = -std=c++17 -Wall -g -O1 -fsanitize=address -I$(LIBDIR)/src
+CFLAGS   = -std=c11 -Wall -g -fsanitize=address $(INC)
+CXXFLAGS = -std=c++17 -Wall -g -O1 -fsanitize=address $(INC)
 
 ARGS =
 
-all: $(LIBTARGET) $(TESTTARGET) $(BNCTARGET) $(TARGET)
+PWD :=$(shell pwd)
+UNAME := $(shell uname)
 
-$(TARGET) : build $(LIBTARGET) $(TESTTARGET) $(BENCHTARGET) $(OBJ)
+ifeq ($(UNAME),Darwin)
+	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.dylib
+endif
+ifeq ($(UNAME),Linux)
+	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.so
+endif
+
+CMAKE_GTEST_BLD=cmake -DBUILD_SHARED_LIBS=ON \
+				-DBUILD_GMOCK=ON \
+				-DCMAKE_CXX_FLAGS=-std=c++17
+
+all: $(GLIB) $(LIBTARGET) $(TESTTARGET) $(BNCTARGET) $(TARGET)
+
+$(GLIB):
+	rm -rf $(PWD)/$(DEP)/gtest
+	git clone -b $(VERSION) https://github.com/google/googletest.git $(PWD)/$(DEP)/gtest
+	mkdir -p  $(PWD)/$(DEP)/gtest/build
+	cd  $(PWD)/$(DEP)/gtest/build && \
+	    $(CMAKE_GTEST_BLD) .. -Dgtest_disable_pthreads=ON && \
+		cmake --build .
+
+
+$(TARGET) : build $(GLIB) $(LIBTARGET) $(TESTTARGET) $(BENCHTARGET) $(OBJ)
+	@echo "GLIB is " $(GLIB)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $(BUILD)/$(TARGET) -lpthread -lhs -l$(TARGET) -I$(LIBDIR)
 
 build :
 	mkdir -p "$(BUILD)/src"
 
 $(LIBTARGET) :
-	cd $(LIBDIR) && make
+	cd $(LIBDIR) && make EXTRA="$(INC)"
 
 $(TESTTARGET) : $(LIBTARGET)
-	cd $(TESTDIR) && make
+	cd $(TESTDIR) && make EXTRA="$(INC)"
 
 $(BNCTARGET) : $(LIB)
-	cd $(BENCHDIR) && make
+	cd $(BENCHDIR) && make EXTRA=$(INC)
 
 $(DOCTARGET) :
 	cd $(DOXYDIR) && make
