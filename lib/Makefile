@@ -15,32 +15,25 @@ EXCEPTION=$(BUILD)/src/Exception
 OUTPUT=$(BUILD)/src/Output
 FRAMEWORK=$(BUILD)/src/Framework
 
-
 TARGET  = lib$(NAME).so
 LIBDIR  =  .
 INSTALL = /usr/local/lib
-HDRINST = /usr/local/include`
+HDRINST = /usr/local/include
 
 OBJ    := $(patsubst %.cpp,$(BUILD)/%.o,$(CXSRC)) $(patsubst %.c,$(BUILD)/%.o,$(CSRC))
 
 ifeq ($(UNAME), Darwin)
 CC       = cc
 CXX      = c++
-CFLAGS   = -std=c11 -Wall -g -fsanitize=address -I$(LIBDIR)/src
-CXXFLAGS = -std=c++17 -Wall -g -fsanitize=address -I$(LIBDIR)/src
 else
 CC     = gcc
 CXX    = g++
-CFLAGS   = -std=c11 -Wall -fPIC -fsanitize=address -I$(LIBDIR)/src
-CXXFLAGS = -std=c++17 -Wall -fPIC -fsanitize=address -I$(LIBDIR)/src
 endif
-
 
 all: $(TARGET)
 
 $(TARGET) : build $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -shared  -o $(BUILD)/$(TARGET) -lpthread -lframework -lre2 -lyaml-cpp
-	make copy
+	$(CXX) $(CXXFLAGS) $(OBJ) -shared  -o $(BUILD)/$(TARGET) -l$(NAME) -lpthread -lre2 -lyaml-cpp $(LINK) $(LNK)
 
 build :
 	mkdir -p $(YAML)

@@ -12,17 +12,19 @@ LIBDEP  = $(LIBDIR)/$(BUILD)/$(LIB)
 
 OBJ := $(patsubst %.cpp,$(BUILD)/%.o,$(CXSRC)) $(patsubst %.c,$(BUILD)/%.o,$(CSRC))
 
-LIBRARIES = -lpthread -lre2 -lhs -lbenchmark -lbenchmark_main -l$(NAME)
+ifeq ($(UNAME), Darwin)
+CC       = cc
+CXX      = c++
+else
+CC     = gcc
+CXX    = g++
+endif
 
-CC     = cc
-CXX    = c++
-CFLAGS = -std=c11 -Wall -fsanitize=address -I$(LIBDIR)/src
-CXXFLAGS = -std=c++17 -Wall -fsanitize=address -I$(LIBDIR)/src
 
 all:  build $(TARGET) $(OBJ) $(LIBDEP)
 
 $(TARGET) : build $(OBJ) $(LIBDEP)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(BUILD)/$(TARGET) -l$(NAME) $(LIBRARIES) -l$(NAME) -L$(LIBDIR)/$(BUILD) -I$(LIBDIR)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $(BUILD)/$(TARGET) -l$(NAME) $(LINK) $(LIBRARIES) $(LNK)
 
 build:
 	mkdir -p "$(BUILD)/src"

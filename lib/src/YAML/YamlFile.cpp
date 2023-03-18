@@ -134,7 +134,7 @@ void YamlFile::readFile()
                     pd.tokens.push_back(token);
                 }
             }
-            catch (std::exception e)
+            catch (std::exception& e)
             {
                 // This must be a dynamic property
                 pd.name = "dynamic";

@@ -11,19 +11,22 @@ LIBDEP  = $(LIBDIR)/$(BUILD)/$(LIB)
 
 CXXOBJ    := $(patsubst %.cpp,$(BUILD)/%.o,$(CXXSRC))
 COBJ      := $(patsubst %.c,$(BUILD)/%.o,$(CSRC))
-PWD=$(shell pwd)
+PWD       := $(shell pwd)
+LINK      := -lgtest -lpthread -lglog -lyaml-cpp -lre2 
 
-INC    = -I$(LIBDIR)/src -I  $(PWD)/../dependancies/gtest/googletest/include
-LIB    = -L../dependancies/gtest/build/lib -rpath $(PWD)/../dependancies/gtest/build/lib
-CC     = cc
-CXX    = c++
-CFLAGS = -g -std=c11 -Wall -fsanitize=address 
-CXXFLAGS = -g -std=c++17 -Wall -O1 -fsanitize=address $(INC)
+ifeq ($(UNAME), Darwin)
+CC       = cc
+CXX      = c++
+else
+CC     = gcc
+CXX    = g++
+endif
+
 
 all: $(TARGET) $(OBJ) $(COBJ) $(LIBDEP)
 
 $(TARGET) : build $(CXXOBJ) $(COBJ)
-	$(CXX) $(CXXFLAGS) $(CXXOBJ) $(COBJ) -o $(BUILD)/$(TARGET) $(LIB) -l$(NAME) -lgtest -lpthread -lglog -lframework -lyaml-cpp
+	$(CXX) $(CXXFLAGS) $(CXXOBJ) $(COBJ) -o $(BUILD)/$(TARGET) -l$(NAME) $(LINK) $(LNK)
 
 build:
 	mkdir -p "$(BUILD)/src"

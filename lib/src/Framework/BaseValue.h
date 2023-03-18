@@ -5,6 +5,7 @@
 #include <string>
 #include <ostream>
 #include <iostream>
+#include <memory>
 
 #include "ValueType.h"
 
