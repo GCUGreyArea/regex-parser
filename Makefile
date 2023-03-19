@@ -1,7 +1,5 @@
 TARGET = parser
 
-
-
 BUILD	   = build
 TESTDIR    = test
 BENCHDIR   = benchmark
@@ -51,18 +49,7 @@ ARGS =
 PWD :=$(shell pwd)
 UNAME := $(shell uname)
 
-ifeq ($(UNAME),Darwin)
-	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.dylib
-endif
-ifeq ($(UNAME),Linux)
-	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.so
-endif
-
-CMAKE_GTEST_BLD=cmake -DBUILD_SHARED_LIBS=ON \
-				-DBUILD_GMOCK=ON \
-				-DCMAKE_CXX_FLAGS=-std=c++17
-
-all: bench json yaml-cpp re2 $(LIBTARGET) $(TESTTARGET) $(BNCTARGET) $(TARGET)
+all: bench json yaml-cpp hyperscan re2 $(LIBTARGET) $(TESTTARGET) $(BNCTARGET) $(TARGET)
 
 RE2_URL:=https://github.com/google/re2.git
 RE2_DEP:=dependancies/re2/build/libre2.so
@@ -108,6 +95,17 @@ $(BENCH_DEP):
 	cd $(PWD)/$(DEP)/bench/build && cmake -DBUILD_SHARED_LIBS=ON -DBENCHMARK_ENABLE_TESTING=OFF .. && cmake --build .
 
 
+ifeq ($(UNAME),Darwin)
+	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.dylib
+endif
+ifeq ($(UNAME),Linux)
+	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.so
+endif
+
+CMAKE_GTEST_BLD=cmake -DBUILD_SHARED_LIBS=ON \
+				-DBUILD_GMOCK=ON \
+				-DCMAKE_CXX_FLAGS=-std=c++17
+
 gtest: $(GLIB)
 
 $(GLIB):
@@ -118,23 +116,16 @@ $(GLIB):
 	    $(CMAKE_GTEST_BLD) .. -Dgtest_disable_pthreads=ON && \
 		cmake --build .
 
-
-# boost: $(BOOST_DEP)
-
-# $(BOOST_DEP):
-# 	git clone --recursive https://github.com/boostorg/boost.git $(PWD)/$(DEP)/boost
-# 	mkdir $(PWD)/$(DEP)/boost/build
-# 	cd $(PWD)/$(DEP)/boost/build && cmake -DBUILD_SHARED_LIBS=ON .. && cmake --build .
-
-
+# Hyperscan needs boost and ragel to be installed
+HYPERSCAN_DEP:=$(PWD)/dependancies/hyperscan/build/lib/libhs.so
 hyperscan: $(HYPERSCAN_DEP)
 
 $(HYPERSCAN_DEP):
 	git clone https://github.com/intel/hyperscan.git $(PWD)/$(DEP)/hyperscan
 	mkdir -p $(PWD)/$(DEP)/hyperscan/build
-	cd $(PWD)/$(DEP)/hyperscan/build && cmake -DBUILD_SHARED_LIBS=ON -DBOOST_ROOT=../../boost .. && cmake --build .
+	cd $(PWD)/$(DEP)/hyperscan/build && cmake -DBUILD_SHARED_LIBS=ON .. && cmake --build .
 
-$(TARGET) : hyperscan json yaml-cpp re2 build $(GLIB) $(LIBTARGET) $(TESTTARGET) $(BENCHTARGET) $(OBJ)
+$(TARGET) : hyperscan json yaml-cpp re2 build gtest $(LIBTARGET) $(TESTTARGET) $(BENCHTARGET) $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $(BUILD)/$(TARGET) $(LNK) -lpthread -lhs -l$(TARGET)
 
 build :
@@ -165,10 +156,6 @@ clean:
 	cd $(LIBDIR) && make clean
 	rm -rf $(BUILD)
 
-
-install: $(TARGET)
-	cp $(TARGET) $(INSTDIR)
-
 valgrind: $(TARGET)
 	valgrind --leak-check=full ./$(TARGET)
 
@@ -178,21 +165,10 @@ docs: $(DOCTARGET)
 test: $(TESTTARGET)
 	cd $(LIBDIR) && make
 	cd $(TESTDIR) && make
-	cd $(TESTDIR) && make run
 
 benchmark: $(BNCTARGET)
 	cd $(LIBDIR) && make
 	cd $(BENCHDIR) && make
-	cd $(BENCHDIR) && make run
-
-runtest:
-	cd $(TESTDIR) && make run
-
-runbench:
-	cd $(BENCHDIR) && make run
-
-run:
-	./$(TARGET) $(ARGS)
 
 project:
 	cd $(LIBDIR) && make
@@ -204,15 +180,13 @@ help:
 	@echo "\n\n"
 	@echo "============================================================================================="
 	@echo "Run: 'make' to build the project"
-	@echo "Run: 'make test' to build and run unit tests"
-	@echo "Run: 'make benchmark' to build and run unit tests - currently no benchmarks are implemented"
-	@echo "Run: 'make runtest' to run the unit tests"
-	@echo "Run: 'make runbench' to run the benchmarks - currently no benchmarks are implemented"
-	@echo "Run: 'make doxygen' to build doxygen documentation\n"
-	@echo "This project depends on:\n"
+	@echo "Run: 'make test' to build unit tests"
+	@echo "Run: 'make benchmark' to build benchmarks - currently no benchmarks are implemented"
+	@echo "Run: 'make doxygen' to build doxygen documentation"
+	@echo "This project depends on:"
 	@echo "\tGoogles test framework availible at https://github.com/google/googletest"
 	@echo "\tGoogles benchmark framework availible at https://github.com/google/benchmark"
-	@echo "\tcpp-yaml availible at https://github.com/jbeder/yaml-cpp"
+	@echo "\tyaml-cpp availible at https://github.com/jbeder/yaml-cpp"
 	@echo "============================================================================================="
 	@echo "\n\n"
 
