@@ -33,6 +33,12 @@ public:
 
         throw Exception::NotAValidBase(str);
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const Regex& rx) {
+        os << rx.mRxStr;
+        return os;
+    }
+
     size_t current_offset(Match& m) {return mResult.end() - m.data();}
 
     std::string get_regex_string() {return mRxStr;}

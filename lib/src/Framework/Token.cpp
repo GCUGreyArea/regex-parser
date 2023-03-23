@@ -60,7 +60,7 @@ bool Token::match_raw(Match& m) {
 }
 
 void Token::print() {
-    // std::cout << "Token [name " << mName << " / regex " << mRegexVal << "]" << std::endl;
+    std::cout << "Token [name " << mName << " / regex " << mRegex << "]" << std::endl;
 }
 
 void Token::validate() {

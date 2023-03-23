@@ -23,7 +23,7 @@ CXXFLAGS = -g -std=c++17 -Wall -O1 -fsanitize=address $(INC)
 all: $(TARGET) $(OBJ) $(COBJ) $(LIBDEP)
 
 $(TARGET) : build $(CXXOBJ) $(COBJ)
-	$(CXX) $(CXXFLAGS) $(CXXOBJ) $(COBJ) -o $(BUILD)/$(TARGET) $(LIB) -l$(NAME) -lgtest -lpthread -lglog -lframework -lyaml-cpp
+	$(CXX) $(CXXFLAGS) $(CXXOBJ) $(COBJ) -o $(BUILD)/$(TARGET) $(LIB) -l$(NAME) -lgtest -lpthread -lglog -lyaml-cpp
 
 build:
 	mkdir -p "$(BUILD)/src"

@@ -31,18 +31,20 @@ void Pattern::add_token(std::string name, std::string ptn, ValueType type, size_
 /**
  * @brief Match a pattern to a sequence of tokens in the message
  *
- * @todo Substitute the Regex pattern for one with the asserted value to minimise
- * execution time
  * @param m
  * @return true
  * @return false
+ * @todo Substitute the Regex pattern for one with the asserted value to
+ * minimize execution time
+ * @todo use hyperscan to test if the complete pattern matches, then use RE2 for
+ * extraction
  */
 bool Pattern::match(Match &m, bool anchor) {
     m.reset();
     m.set_match_type(mMatchType);
 
     if(anchor) {
-        if (!mAnchor.match(m)){
+        if (!mAnchor.match(m)) {
             return false;
         }
         else {
@@ -54,12 +56,13 @@ bool Pattern::match(Match &m, bool anchor) {
     size_t size = mTokens.size();
     for (size_t i = 0; i < size; i++) {
         auto &t = mTokens.at(i);
-        if(mTkAsserts.size() > 0){
+        if(mTkAsserts.size() > 0) {
             auto &a = mTkAsserts.at(i);
             if (a != "") {
                 if (!t->match(m, a))
                     return false;
             }
+            
             if (!t->match(m))
                 return false;
         }
@@ -73,7 +76,6 @@ bool Pattern::match(Match &m, bool anchor) {
     mMatched = true;
     return true;
 }
-
 
 bool Pattern:: matched() {
     return mMatched;

@@ -39,7 +39,7 @@ endif
 all: $(TARGET)
 
 $(TARGET) : build $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -shared  -o $(BUILD)/$(TARGET) -lpthread -lframework -lre2 -lyaml-cpp
+	$(CXX) $(CXXFLAGS) $(OBJ) -shared  -o $(BUILD)/$(TARGET) -lpthread -lre2 -lyaml-cpp
 	make copy
 
 build :
