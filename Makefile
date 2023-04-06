@@ -186,6 +186,11 @@ help:
 	@echo "\thyperscan availible at https://github.com/intel/hyperscan"
 	@echo "\tGoogle RE2 availible at https://github.com/google/re2"
 	@echo "\tnlohman json parser availible at https://github.com/nlohmann/json"
+	@echo "Build tools"
+	@echo "\tcmake see https://cmake.org/"
+	@echo "\tdoxygen see https://www.doxygen.nl/"
+	@echo "Utilities"
+	@echo "\tjq availible at https://github.com/stedolan/jq"
 	@echo "============================================================================================="
 	@echo "\n\n"
 
