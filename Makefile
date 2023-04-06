@@ -15,13 +15,16 @@ BNCTARGET  = $(BENCHDIR)/$(BUILD)/benchmark_$(TARGET)
 LIBTARGET  = $(LIBDIR)/$(BUILD)/lib$(TARGET).so
 DOCTARGET  = $(DOXYDIR)/generated
 
+PWD :=$(shell pwd)
+UNAME := $(shell uname)
+
 SRC = $(shell find src -name '*.cpp')
 
 OBJ := $(patsubst %.cpp,$(BUILD)/%.o,$(SRC))
 
 INC = -I$(PWD)/$(LIBDIR)/src \
       -I$(PWD)/$(DEP)/bench/include \
-	  -I$(PWD)/$(DEP)/gtest/include \
+	  -I$(PWD)/$(DEP)/gtest/googletest/include \
       -I$(PWD)/$(DEP)/re2 \
 	  -I$(PWD)/$(DEP)/yaml-cpp/include \
 	  -I$(PWD)/$(DEP)/json/include \
@@ -30,10 +33,16 @@ INC = -I$(PWD)/$(LIBDIR)/src \
 LNK = -L$(PWD)/lib/build \
 	  -L$(PWD)/dependancies/bench/build/src \
       -L$(PWD)/dependancies/yaml-cpp/build \
-	  -L$(PWD)/dependancies/gtest/build \
-	  -L$(PWD)/dependancies/re2/build \
-	  -L$(PWD)/dependancies/hyperscan/build/lib \
-	  -Wl,-rpath,$(PWD)/dependancies/bench/build/src,-rpath,$(PWD)/dependancies/yaml-cpp/build,-rpath,$(PWD)/lib/build,-rpath,$(PWD)/dependancies/re2/build,-rpath,$(PWD)/dependancies/hyperscan/build/lib 
+	  -L$(PWD)/dependancies/gtest/build/lib \
+	  -L$(PWD)/dependancies/re2/build_dir \
+	  -L$(PWD)/dependancies/hyperscan/build/lib 
+
+ifeq ($(UNAME),Darwin)
+	LNK += -Wl,-rpath,$(PWD)/dependancies/bench/build/src,-rpath,$(PWD)/dependancies/yaml-cpp/build,-rpath,$(PWD)/lib/build,-rpath,$(PWD)/dependancies/re2/build_dir,-rpath,$(PWD)/dependancies/hyperscan/build/lib,-rpath,$(PWD)/dependancies/gtest/build/lib
+endif
+ifeq ($(UNAME),Linux)
+	LNK += -Wl,-rpath,$(PWD)/dependancies/bench/build/src,-rpath,$(PWD)/dependancies/yaml-cpp/build,-rpath,$(PWD)/lib/build,-rpath,$(PWD)/dependancies/re2/build_dir,-rpath,$(PWD)/dependancies/hyperscan/build/lib
+endif
     
 LIBRARIES = -lbenchmark -lbenchmark_main -lyaml-cpp -lre2 -lgtest
 CFLAGS   = -std=c11 -Wall -g -fsanitize=address $(INC)
@@ -46,24 +55,21 @@ export LIBRARIES
 
 ARGS =
 
-PWD :=$(shell pwd)
-UNAME := $(shell uname)
-
-all: bench json yaml-cpp hyperscan re2 $(LIBTARGET) $(TESTTARGET) $(BNCTARGET) $(TARGET)
+all: bench json yaml-cpp hyperscan re2 gtest $(LIBTARGET) $(TESTTARGET) $(BNCTARGET) $(TARGET)
 
 RE2_URL:=https://github.com/google/re2.git
-RE2_DEP:=dependancies/re2/build/libre2.so
+RE2_DEP:=dependancies/re2/build_dir/CMakeCache.txt
 
 re2: $(RE2_DEP)
 
 $(RE2_DEP): 
 	rm -rf $(PWD)/$(DEP)/re2
 	git clone -b main https://github.com/google/re2.git $(PWD)/$(DEP)/re2
-	mkdir -p $(PWD)/$(DEP)/re2/build
-	cd $(PWD)/$(DEP)/re2/build && cmake -DBUILD_SHARED_LIBS=ON .. && cmake --build .  
+	mkdir -p $(PWD)/$(DEP)/re2/build_dir
+	cd $(PWD)/$(DEP)/re2/build_dir && cmake -DBUILD_SHARED_LIBS=ON .. && cmake --build .  
 	
 YAML_URL:=https://github.com/jbeder/yaml-cpp.git
-YAML_DEP:= $(PWD)/$(DEP)/yaml-cpp/build/libyaml-cpp.so
+YAML_DEP:= $(PWD)/$(DEP)/yaml-cpp/build/CMakeCache.txt
 
 yaml-cpp: $(YAML_DEP)
 
@@ -84,7 +90,7 @@ $(JSON_DEP):
 
 
 BENCH_URL:=https://github.com/google/benchmark.git
-BENCH_DEP:=$(PWD)/$(DEP)/bench/build/src/libbenchmark.so
+BENCH_DEP:=$(PWD)/$(DEP)/bench/build/CMakeCache.txt
 
 bench: $(BENCH_DEP)
 
@@ -95,13 +101,7 @@ $(BENCH_DEP):
 	cd $(PWD)/$(DEP)/bench/build && cmake -DBUILD_SHARED_LIBS=ON -DBENCHMARK_ENABLE_TESTING=OFF .. && cmake --build .
 
 
-ifeq ($(UNAME),Darwin)
-	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.dylib
-endif
-ifeq ($(UNAME),Linux)
-	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.so
-endif
-
+GLIB=$(PWD)/$(DEP)/gtest/build/CMakeCache.txt
 CMAKE_GTEST_BLD=cmake -DBUILD_SHARED_LIBS=ON \
 				-DBUILD_GMOCK=ON \
 				-DCMAKE_CXX_FLAGS=-std=c++17
@@ -117,7 +117,7 @@ $(GLIB):
 		cmake --build .
 
 # Hyperscan needs boost and ragel to be installed
-HYPERSCAN_DEP:=$(PWD)/dependancies/hyperscan/build/lib/libhs.so
+HYPERSCAN_DEP:=$(PWD)/dependancies/hyperscan/build/CMakeCache.txt
 hyperscan: $(HYPERSCAN_DEP)
 
 $(HYPERSCAN_DEP):
@@ -170,11 +170,7 @@ benchmark: $(BNCTARGET)
 	cd $(LIBDIR) && make
 	cd $(BENCHDIR) && make
 
-project:
-	cd $(LIBDIR) && make
-	cd $(TESTDIR) && make
-	cd $(BENCHDIR) && make
-	make
+project: bench json yaml-cpp hyperscan re2 gtest $(LIBTARGET) $(TESTTARGET) $(BNCTARGET) $(TARGET)
 
 help:
 	@echo "\n\n"
