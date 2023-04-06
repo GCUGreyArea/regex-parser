@@ -2,7 +2,7 @@
 
 ## Notice
 
-This is a proof of concept application to demonstrate a principal in the architecture of parsing. It does not have a framework and has not been written to be efficient or to production standards.
+This is a proof of concept application that was developed on MacOS to demonstrate a principal in the architecture of parsing. It does not have a framework and has not been written to be efficient or to production standards. It has been ported to Linux, but the build might not be stable yet. Specifically the dependancies and external libraries. 
 
 ## Terminology
 
