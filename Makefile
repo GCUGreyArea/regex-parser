@@ -183,6 +183,9 @@ help:
 	@echo "\tGoogles test framework availible at https://github.com/google/googletest"
 	@echo "\tGoogles benchmark framework availible at https://github.com/google/benchmark"
 	@echo "\tyaml-cpp availible at https://github.com/jbeder/yaml-cpp"
+	@echo "\thyperscan availible at https://github.com/intel/hyperscan"
+	@echo "\tGoogle RE2 availible at https://github.com/google/re2"
+	@echo "\tnlohman json parser availible at https://github.com/nlohmann/json"
 	@echo "============================================================================================="
 	@echo "\n\n"
 
