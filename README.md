@@ -30,11 +30,15 @@ $ ./test/build/test_parser
 
 ## Build requirements
 
-The project requires [Google test](https://github.com/google/googletest) framework along with [Google benchmark](https://github.com/google/benchmark) though to be fair at the moment [Google benchmark](https://github.com/google/benchmark) isn't doing very much.
+The project requiresthe following to be instaled and correctly configured 
+
+- [Google test](https://github.com/google/googletest) 
+- [Google benchmark](https://github.com/google/benchmark) though to be fair at the moment [Google benchmark](https://github.com/google/benchmark) isn't doing very much.
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp): This is a head only solution, so it would be possible to simply copy the dependancy intp the project and modify the makefile
+- [JSON C++ library](https://github.com/nlohmann/json): This is also a single hedaer solution and the above also applies here.
+
 
 Both these libraries have their own requirements, but these are minimal in so far as they require `pthreads` to be installed and to link.
-
-The class `YamlFile` also depends on [yaml-cpp](https://github.com/jbeder/yaml-cpp) for YAML file parsing.
 
 ## Limitations
 
