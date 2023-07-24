@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <glog/logging.h>
 
+#include <re2/re2.h>
 #include <iostream>
 #include <libParser.h>
 

@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 #include <nlohmann/json.hpp>
-#include <hs.h>
+#include <hs/hs.h>
 
 #include <libParser.h>
 #include "Args.h"
