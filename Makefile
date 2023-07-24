@@ -7,6 +7,7 @@ LIBDIR     = lib
 DOXYDIR	   = docs
 BUILD      = build
 DEP		   = dependancies
+
 VERSION    = v1.13.0
 DEP        = dependancies
 
@@ -19,29 +20,17 @@ SRC = $(shell find src -name '*.cpp')
 
 OBJ := $(patsubst %.cpp,$(BUILD)/%.o,$(SRC))
 
-INC = -I$(PWD)/$(LIBDIR)/src \
-      -I$(PWD)/$(DEP)/bench/include \
-	  -I$(PWD)/$(DEP)/gtest/include \
-      -I$(PWD)/$(DEP)/re2 \
-	  -I$(PWD)/$(DEP)/yaml-cpp/include \
-	  -I$(PWD)/$(DEP)/json/include \
-	  -I$(PWD)/$(DEP)/hyperscan/src
-
-LNK = -L$(PWD)/lib/build \
-	  -L$(PWD)/dependancies/bench/build/src \
-      -L$(PWD)/dependancies/yaml-cpp/build \
-	  -L$(PWD)/dependancies/gtest/build \
-	  -L$(PWD)/dependancies/re2/build \
-	  -L$(PWD)/dependancies/hyperscan/build/lib \
-	  -Wl,-rpath,$(PWD)/dependancies/bench/build/src,-rpath,$(PWD)/dependancies/yaml-cpp/build,-rpath,$(PWD)/lib/build,-rpath,$(PWD)/dependancies/re2/build,-rpath,$(PWD)/dependancies/hyperscan/build/lib 
+INC = -I$(PWD)/$(LIBDIR)/src 
+LNK = -L$(PWD)/lib/build 
     
-LIBRARIES = -lbenchmark -lbenchmark_main -lyaml-cpp -lre2 -lgtest
+LIBRARIES = -lyaml-cpp -lre2 -lhs
 CFLAGS   = -std=c11 -Wall -g -fsanitize=address $(INC)
-CXXFLAGS = -std=c++17 -fPIC -Wall -g -O1 -fsanitize=address $(INC)
+CXXFLAGS = -std=c++17 -fPIC -Wall -g -fsanitize=address $(INC)
 
 export CXXFLAGS
 export CFLAGS
 export LNK
+export INC
 export LIBRARIES
 
 ARGS =
@@ -49,84 +38,10 @@ ARGS =
 PWD :=$(shell pwd)
 UNAME := $(shell uname)
 
-all: bench json yaml-cpp hyperscan re2 $(LIBTARGET) $(TESTTARGET) $(BNCTARGET) $(TARGET)
+all: $(LIBTARGET) $(TARGET)
 
-RE2_URL:=https://github.com/google/re2.git
-RE2_DEP:=dependancies/re2/build/libre2.so
-
-re2: $(RE2_DEP)
-
-$(RE2_DEP): 
-	rm -rf $(PWD)/$(DEP)/re2
-	git clone -b main https://github.com/google/re2.git $(PWD)/$(DEP)/re2
-	mkdir -p $(PWD)/$(DEP)/re2/build
-	cd $(PWD)/$(DEP)/re2/build && cmake -DBUILD_SHARED_LIBS=ON .. && cmake --build .  
-	
-YAML_URL:=https://github.com/jbeder/yaml-cpp.git
-YAML_DEP:= $(PWD)/$(DEP)/yaml-cpp/build/libyaml-cpp.so
-
-yaml-cpp: $(YAML_DEP)
-
-$(YAML_DEP):
-	rm -rf $(PWD)/$(DEP)/yaml-cpp
-	git clone -b master $(YAML_URL) $(PWD)/$(DEP)/yaml-cpp
-	mkdir -p $(PWD)/$(DEP)/yaml-cpp/build
-	cd $(PWD)/$(DEP)/yaml-cpp/build && cmake -DBUILD_SHARED_LIBS=ON .. && cmake --build .
-
-
-JSON_URL:=https://github.com/nlohmann/json.git
-JSON_DEP:=$(PWD)/$(DEP)/json/include/nlohmann/json.hpp
-
-json: $(JSON_DEP)
-
-$(JSON_DEP):
-	git clone $(JSON_URL) $(PWD)/$(DEP)/json
-
-
-BENCH_URL:=https://github.com/google/benchmark.git
-BENCH_DEP:=$(PWD)/$(DEP)/bench/build/src/libbenchmark.so
-
-bench: $(BENCH_DEP)
-
-$(BENCH_DEP):
-	rm -rf $(PWD)/$(DEP)/bench
-	git clone $(BENCH_URL) $(PWD)/$(DEP)/bench
-	mkdir -p $(PWD)/$(DEP)/bench/build
-	cd $(PWD)/$(DEP)/bench/build && cmake -DBUILD_SHARED_LIBS=ON -DBENCHMARK_ENABLE_TESTING=OFF .. && cmake --build .
-
-
-ifeq ($(UNAME),Darwin)
-	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.dylib
-endif
-ifeq ($(UNAME),Linux)
-	GLIB=$(PWD)/$(DEP)/gtest/build/lib/libgtest.so
-endif
-
-CMAKE_GTEST_BLD=cmake -DBUILD_SHARED_LIBS=ON \
-				-DBUILD_GMOCK=ON \
-				-DCMAKE_CXX_FLAGS=-std=c++17
-
-gtest: $(GLIB)
-
-$(GLIB):
-	rm -rf $(PWD)/$(DEP)/gtest
-	git clone -b $(VERSION) https://github.com/google/googletest.git $(PWD)/$(DEP)/gtest
-	mkdir -p $(PWD)/$(DEP)/gtest/build
-	cd  $(PWD)/$(DEP)/gtest/build && \
-	    $(CMAKE_GTEST_BLD) .. -Dgtest_disable_pthreads=ON && \
-		cmake --build .
-
-# Hyperscan needs boost and ragel to be installed
-HYPERSCAN_DEP:=$(PWD)/dependancies/hyperscan/build/lib/libhs.so
-hyperscan: $(HYPERSCAN_DEP)
-
-$(HYPERSCAN_DEP):
-	git clone https://github.com/intel/hyperscan.git $(PWD)/$(DEP)/hyperscan
-	mkdir -p $(PWD)/$(DEP)/hyperscan/build
-	cd $(PWD)/$(DEP)/hyperscan/build && cmake -DBUILD_SHARED_LIBS=ON .. && cmake --build .
-
-$(TARGET) : hyperscan json yaml-cpp re2 build gtest $(LIBTARGET) $(TESTTARGET) $(BENCHTARGET) $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(BUILD)/$(TARGET) $(LNK) -lpthread -lhs -l$(TARGET)
+$(TARGET) : build $(LIBTARGET) $(TESTTARGET) $(BENCHTARGET) $(OBJ)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $(BUILD)/$(TARGET) $(LNK) -l$(TARGET) $(LIBRARIES) -Wl,-rpath,$(LIBDIR)/$(BUILD)
 
 build :
 	mkdir -p "$(BUILD)/src"
