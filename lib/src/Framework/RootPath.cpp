@@ -230,14 +230,14 @@ std::vector<std::vector<size_t>> RootPath::get_all_subsets(std::vector<size_t>& 
     std::vector<size_t> empty;
     subset.push_back( empty );
 
-    for (int i = 0; i < set.size(); i++)
+    for (std::size_t i = 0; i < set.size(); i++)
     {
         std::vector<std::vector<size_t>> subsetTemp = subset;  //making a copy of given 2-d vector.
 
-        for (auto j = 0L; j < subsetTemp.size(); j++)
+        for (std::size_t j = 0L; j < subsetTemp.size(); j++)
             subsetTemp[j].push_back( set[i] );   // adding set[i] element to each subset of subsetTemp. like adding {2}(in 2nd iteration  to {{},{1}} which gives {{2},{1,2}}.
 
-        for (auto j = 0L; j < subsetTemp.size(); j++)
+        for (std::size_t j = 0L; j < subsetTemp.size(); j++)
             subset.push_back( subsetTemp[j] );  //now adding modified subsetTemp to original subset (before{{},{1}} , after{{},{1},{2},{1,2}})
     }
     return subset;

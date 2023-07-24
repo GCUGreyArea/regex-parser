@@ -18,7 +18,7 @@ public:
     bool match(Match& m);
     bool match(Match& m, std::string assert);
     void validate();
-    std::string as_string() const {return mResult.as_string();}
+    std::string as_string() const {return {mResult.begin(),mResult.end()};}
 
     /**
      * @brief Convert the result of a regex to a valid number based on parsed format
@@ -26,7 +26,7 @@ public:
      * @return int
      */
     int as_int() const {
-        std::string str = mResult.as_string();
+        std::string str = {mResult.begin(),mResult.end()};
         unsigned int base = Numbers::is_number(str);
         if(base > 0)
             return Numbers::to_int(str,base);
