@@ -56,8 +56,6 @@ The rule definition in `rules/CheckPoint/CheckPoint.yaml` is a rule that
 
 It differentiates based on the value of the field `action` in two sub patterns that assert the events `CheckPoint Accepted` and `CheckPoint Rejected`.
 
-Conceptually, rule structure is hierarchical in line with ideas put forward by [Guy Duchatelet​](gduchatelet@alertlogic.com) in his [Proposed hierarchical content language](https://alertlogic.atlassian.net/wiki/spaces/DPT/pages/3332964353/24+03+2022+-+Parser+Tree+approach+discussion#Proposed-hierarchical-content-language-(link)%3A).
-
 Rules are expressed such that a rule can either
 
 1. Declare a single pattern that generates an event by asserting the name given to the rule
