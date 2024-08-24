@@ -1,5 +1,10 @@
 # Token based extensible message parser
 
+## TODO
+
+1. Create Docker build to run build and test in container environment.
+2. Fix issues with benchmark tests - see: 
+
 ## Notice
 
 This is a proof of concept application to demonstrate a principal in the architecture of parsing. It does not have a framework and has not been written to be efficient or to production standards.
