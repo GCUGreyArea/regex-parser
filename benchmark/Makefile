@@ -19,7 +19,8 @@ endif
 all:  build $(TARGET) $(OBJ) $(LIBDEP)
 
 $(TARGET) : build $(OBJ) $(LIBDEP)
-	$(CXX) $(CXXFLAGS) $(CXXOBJ) $(COBJ) $(LNK_PATH) -o $(BUILD)/$(TARGET) -lpthread -l$(NAME) $(LIBRARIES) -lbenchmark -L$(LINK) -Wl,-rpath,$(LNK_PATH)
+	cd ../lib && make
+	$(CXX) $(CXXFLAGS) $(CXXOBJ) $(COBJ) -L$(LNK_PATH) -o $(BUILD)/$(TARGET) -lpthread -l$(NAME) $(LIBRARIES) -lbenchmark -lbenchmark_main -Wl,-rpath,$(LNK_PATH)
 
 build:
 	mkdir -p "$(BUILD)/src"
