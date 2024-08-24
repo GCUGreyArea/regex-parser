@@ -12,14 +12,11 @@ LIBDEP  = $(LIBDIR)/$(BUILD)/$(LIB)
 CXXOBJ    := $(patsubst %.cpp,$(BUILD)/%.o,$(CXXSRC))
 COBJ      := $(patsubst %.c,$(BUILD)/%.o,$(CSRC))
 PWD       := $(shell pwd)
-LINK      := -lgtest -lpthread -lglog  
+LINK      := -L$(LNK_PATH) -lgtest -lpthread -lglog
 
 LIBRARIES = -lre2 -lhs
-CFLAGS   = -std=c11 -Wall -g -fsanitize=address $(INC)
-CXXFLAGS = -std=c++17 -fPIC -Wall -g -fsanitize=address $(INC)
-
-
-CXXFLAGS = -std=c++17 -Wall -g -O1 -fsanitize=address -I$(LIBDIR)/src
+CFLAGS   = -std=c11 -Wall -g -fsanitize=address 
+CXXFLAGS = -std=c++17 -Wall -g -O1 -fsanitize=address $(INC)
 
 ifeq ($(UNAME), Darwin)
 CC       = cc
@@ -33,7 +30,8 @@ endif
 all: $(TARGET) $(OBJ) $(COBJ) $(LIBDEP)
 
 $(TARGET) : build $(CXXOBJ) $(COBJ)
-	$(CXX) $(CXXFLAGS) $(CXXOBJ) $(COBJ) $(LNK) -o $(BUILD)/$(TARGET) -l$(NAME) $(LIBRARIES) $(LINK)
+	@echo "LNK_PATH : $(LIBTARGET)"
+	$(CXX) $(CXXFLAGS) -L$(LNK_PATH) $(CXXOBJ) $(COBJ) -o $(BUILD)/$(TARGET) -l$(NAME) $(LIBRARIES) $(LINK) -Wl,-rpath,$(LNK_PATH)
 
 build:
 	mkdir -p "$(BUILD)/src"

@@ -13,15 +13,15 @@ DEP        = dependancies
 
 TESTTARGET = $(TESTDIR)/$(BUILD)/test_$(TARGET)
 BNCTARGET  = $(BENCHDIR)/$(BUILD)/benchmark_$(TARGET)
-LIBTARGET  = $(LIBDIR)/$(BUILD)/lib$(TARGET).so
+LIBTARGET  = $(PWD)/$(LIBDIR)/$(BUILD)/lib$(TARGET).so
 DOCTARGET  = $(DOXYDIR)/generated
 
 SRC = $(shell find src -name '*.cpp')
 
 OBJ := $(patsubst %.cpp,$(BUILD)/%.o,$(SRC))
 
-INC = -I$(PWD)/$(LIBDIR)/src 
-LNK = -L$(PWD)/lib/build 
+INC = -I$(PWD)/$(LIBDIR) -I$(PWD)/$(LIBDIR)/src
+LNK_PATH = $(PWD)/lib/build 
     
 LIBRARIES = -lyaml-cpp -lre2 -lhs
 CFLAGS   = -std=c11 -Wall -g -fsanitize=address $(INC)
@@ -29,9 +29,10 @@ CXXFLAGS = -std=c++17 -fPIC -Wall -g -fsanitize=address $(INC)
 
 export CXXFLAGS
 export CFLAGS
-export LNK
+export LNK_PATH
 export INC
 export LIBRARIES
+export LIBTARGET
 
 ARGS =
 
@@ -41,7 +42,7 @@ UNAME := $(shell uname)
 all: $(LIBTARGET) $(TARGET)
 
 $(TARGET) : build $(LIBTARGET) $(TESTTARGET) $(BENCHTARGET) $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(BUILD)/$(TARGET) $(LNK) -l$(TARGET) $(LIBRARIES) -Wl,-rpath,$(LIBDIR)/$(BUILD)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $(BUILD)/$(TARGET) -L$(LNK_PATH) -l$(TARGET) $(LIBRARIES) -Wl,-rpath,$(LNK_PATH)
 
 build :
 	mkdir -p "$(BUILD)/src"

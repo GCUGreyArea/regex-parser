@@ -4,11 +4,7 @@ CSRC  = $(wildcard src/*.c)
 
 TARGET = benchmark_$(NAME)
 
-LIBDIR  = ../lib
-LIB     = lib$(NAME).so
 BUILD   = build
-LIBDEP  = $(LIBDIR)/$(BUILD)/$(LIB)
-
 
 OBJ := $(patsubst %.cpp,$(BUILD)/%.o,$(CXSRC)) $(patsubst %.c,$(BUILD)/%.o,$(CSRC))
 
@@ -20,11 +16,10 @@ CC     = gcc
 CXX    = g++
 endif
 
-
 all:  build $(TARGET) $(OBJ) $(LIBDEP)
 
 $(TARGET) : build $(OBJ) $(LIBDEP)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(BUILD)/$(TARGET) -l$(NAME) $(LINK) $(LIBRARIES) $(LNK)
+	$(CXX) $(CXXFLAGS) $(CXXOBJ) $(COBJ) $(LNK_PATH) -o $(BUILD)/$(TARGET) -lpthread -l$(NAME) $(LIBRARIES) -lbenchmark -L$(LINK) -Wl,-rpath,$(LNK_PATH)
 
 build:
 	mkdir -p "$(BUILD)/src"

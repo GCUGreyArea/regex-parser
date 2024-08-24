@@ -33,7 +33,7 @@ endif
 all: $(TARGET)
 
 $(TARGET) : build $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -shared  -o $(BUILD)/$(TARGET) -l$(NAME) -lpthread -lre2 -lyaml-cpp $(LINK) $(LNK)
+	$(CXX) $(CXXFLAGS) $(OBJ) -shared  -o $(BUILD)/$(TARGET) -lpthread -lre2 -lyaml-cpp $(LINK)
 
 build :
 	mkdir -p $(YAML)
