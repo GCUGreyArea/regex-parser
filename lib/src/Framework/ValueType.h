@@ -2,12 +2,12 @@
 #define VALUE_TYPE_H
 /**
  * @file ValueType.h
- * @author Barry Robinson (barry.robinson@alertlogic.com)
+ * @author Barry Robinson (barry.w.robinson64@gmail.com)
  * @brief Value type for variables and tokens, etc
  * @version 1.0
  * @date 29-04-2022
  *
- * @copyright Copyright (c) Alert Logic 2022
+ * @copyright Copyright (C) Barry Robinson 2022
  *
  */
 

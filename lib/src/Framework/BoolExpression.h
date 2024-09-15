@@ -2,13 +2,13 @@
 #define EXPRESSION_H
 /**
  * @file BoolExpression.h
- * @author Barry Robinson (barry.robinson@alertlogic.com)
+ * @author Barry Robinson (barry.w.robinson64@gmail.com)
  * @brief An expression as a tree of expressions.
  * Each leaf (lhs or rhs) can either be a pointer to another BoolExpression or an C
  * @version 1.0
  * @date 27-04-2022
  *
- * @copyright Copyright (c) Alert Logic 2022
+ * @copyright Copyright (C) Barry Robinson 2022
  *
  */
 

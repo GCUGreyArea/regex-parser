@@ -3,7 +3,7 @@
 
 /**
  * @file Assignment.h
- * @author Barry Robinson (barry.robinson@alertlogic.com)
+ * @author Barry Robinson (barry.w.robinson64@gmail.com)
  * @brief This is a simple assignment operation that does not deal with the notion of
  * operator precedence or anything more complex than more than concatenation of string or
  * the addition and subtraction of numbers. This is due to
@@ -16,7 +16,7 @@
  * @version 1.0
  * @date 08-05-2022
  *
- * @copyright Copyright (c) Alert Logic 2022
+ * @copyright Copyright (C) Barry Robinson 2022
  *
  */
 

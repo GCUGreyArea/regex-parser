@@ -115,10 +115,10 @@ static int get_rules_and_messages(std::vector<std::unique_ptr<Rule>> &rules,
                                   std::vector<std::string> &messages) {
 
   std::string dir =
-      "/Users/barry.robinson/workspace/sandbox/development/parser/rules";
+      "rules";
   std::string msg = "";
   std::string logs =
-      "/Users/barry.robinson/workspace/sandbox/development/parser/logs";
+      "logs";
 
   if (!read_rules(dir, rules)) {
     std::cerr << "Failed to read rules from [dir " << dir << "]" << std::endl;
@@ -195,9 +195,7 @@ static void BM_Expression(benchmark::State &state) {
         for (auto _ : state) {
             e2.evaluate();
         }
-
     }
-
 }
 
 
@@ -205,4 +203,4 @@ static void BM_Expression(benchmark::State &state) {
 BENCHMARK(BM_Expression);
 
 // Run the benchmark
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN();

@@ -377,7 +377,7 @@ int main(int argc, const char ** argv)
 
 	if(args.is_key_present("-t")) {
 		bool display = args.is_key_present("-s");
-		int runfor = args.get_int_value("-e");
+		unsigned int runfor = args.get_int_value("-e");
 		std::string run;
 		std::cout << "Entering test mode" << std::endl;
 		std::cout << "Press CTRL + C to exit" << std::endl;

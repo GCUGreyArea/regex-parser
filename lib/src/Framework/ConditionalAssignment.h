@@ -2,14 +2,14 @@
 #define CONDITIONAL_ASSIGNMENT_H
 /**
  * @file ConditionalAssignment.h
- * @author Barry Robinson (barry.robinson@alertlogic.com)
+ * @author Barry Robinson (barry.w.robinson64@gmail.com)
  * @brief Represents a simple if then else structure for dynamic assignment of properties
  * If the BoolExpression evaluates to true, mThen will be evaluated. If there is an mElse, that
  * expression will be evaluated if the "if" BoolExpression evalutes to false.
  * @version 1.0
  * @date 30-04-2022
  *
- * @copyright Copyright (c) Alert Logic 2022
+ * @copyright Copyright (C) Barry Robinson 2022
  *
  */
 

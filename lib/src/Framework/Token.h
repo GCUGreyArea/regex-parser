@@ -3,12 +3,12 @@
 
 /**
  * @file Token.h
- * @author Barry Robinson (barry.robinson@alertlogic.com)
+ * @author Barry Robinson (barry.w.robinson64@gmail.com)
  * @brief Represent a token with its matching regex
  * @version 1.0
  * @date 12-03-2022
  *
- * @copyright Copyright (c) Alert Logic 2022
+ * @copyright Copyright (C) Barry Robinson 2022
  *
  */
 #include <string>
