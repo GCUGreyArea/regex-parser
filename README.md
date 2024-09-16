@@ -2,8 +2,9 @@
 
 ## TODO
 
-1. Create Docker build to run build and test in container environment.
-2. Fix issues with benchmark tests - see: 
+1. Optimise conditional logic be creating fixed types via inheritance
+2. Create Docker build to run build and test in container environment.
+3. Fix issues with benchmark tests
 
 ## Notice
 
