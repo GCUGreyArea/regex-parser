@@ -78,6 +78,10 @@ Rules are expressed such that a rule can either
 3. Assert properties if and only if the pattern matches
    1. As dynamically constructed objects based on extracted field values
    2. Through conditional logic as dynamically constructed objects based on extracted field values
+4. Declare `examples:` that are validated when the full ruleset is loaded
+   1. each example must match exactly one rule in the loaded ruleset
+   2. that rule and pattern must be the one that declared the example
+   3. expected token values and properties can be asserted explicitly
 
 The rule definition for the `CheckPoint` message looks like this
 
@@ -98,7 +102,12 @@ patterns:
     # Tokens in this declaration will be evaluated in the order they are specified 'flags' coming before 'action' would cause the pattern fail
     match: sequential
     tokens: [action,direction,contextnum,flags,ifdir,ifname,loguid,sequencenum,time,version,database_tag,layer_uuid,match_id]
-    example: "CheckPoint 9929 - [action:\"Accept\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; logid:\"0\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; origin:\"<IP>\"; originsicname:\"CN=Ord1fw1b,O=bos1cpmgmt1.aspect.com.2twi3g\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; context_num:\"1\"; dst:\"<IP>\"; hll_key:\"3383197236451420632\"; layer_name:\"<name>\"; layer_name:\"<name>\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; layer_uuid:\"3866c7f4-f88d-402e-abde-252a2426d1d7\"; match_id:\"48\"; match_id:\"16777222\"; parent_rule:\"0\"; parent_rule:\"0\"; rule_action:\"Accept\"; rule_action:\"Accept\"; rule_name:\"Outbound access\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; rule_uid:\"4eb09b29-ccc2-4374-b33a-e66660e3916d\"; nat_addtnl_rulenum:\"0\"; nat_rulenum:\"400\"; product:\"VPN-1 & FireWall-1\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\"; src:\"<IP>\"; xlatedport:\"0\"; xlatedst:\"<IP>\"; xlatesport:\"28650\"; xlatesrc:\"<IP>\"]"
+    examples:
+      - message: "CheckPoint 9929 - [action:\"Drop\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; match_id:\"48\";]"
+        expect:
+          tokens:
+            action: Drop
+            contextnum: 1
     # A property in this model applies to a pattern and concatenates values and token values
   - id: 1950E2A8-D49F-1CF4-DB2B-8B37B61CFBC0
     name: CheckPoint Accepted
@@ -121,7 +130,16 @@ patterns:
         tokens: [action,service_id]
       - property:
         dynamic: if contextnum >= 3 then threat.level = "danger"
-    example: "CheckPoint 9929 - [action:\"Reject\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; logid:\"0\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; origin:\"<IP>\"; originsicname:\"CN=Ord1fw1b,O=bos1cpmgmt1.aspect.com.2twi3g\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; context_num:\"1\"; dst:\"<IP>\"; hll_key:\"3383197236451420632\"; layer_name:\"<name>\"; layer_name:\"<name>\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; layer_uuid:\"3866c7f4-f88d-402e-abde-252a2426d1d7\"; match_id:\"48\"; match_id:\"16777222\"; parent_rule:\"0\"; parent_rule:\"0\"; rule_action:\"Accept\"; rule_action:\"Accept\"; rule_name:\"Outbound access\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; rule_uid:\"4eb09b29-ccc2-4374-b33a-e66660e3916d\"; nat_addtnl_rulenum:\"0\"; nat_rulenum:\"400\"; product:\"VPN-1 & FireWall-1\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\"; src:\"<IP>\"; xlatedport:\"0\"; xlatedst:\"<IP>\"; xlatesport:\"28650\"; xlatesrc:\"<IP>\"]"
+    examples:
+      - message: "CheckPoint 9929 - [action:\"Accept\"; conn_direction:\"Outgoing\"; contextnum:\"5\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; match_id:\"48\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\";]"
+        expect:
+          tokens:
+            action: Accept
+            contextnum: 5
+            service_id: https
+          properties:
+            event.type: Accept.https
+            threat.level: danger
   - id: 3927EB41-29B8-C62E-648E-DB5F4C4C2E67
     name: CheckPoint Rejected
     desc: >-
@@ -134,7 +152,16 @@ patterns:
     assert:
       - token: action
         value: Reject
-    example: "CheckPoint 9929 - [action:\"Reject\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; logid:\"0\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; origin:\"<IP>\"; originsicname:\"CN=Ord1fw1b,O=bos1cpmgmt1.aspect.com.2twi3g\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; context_num:\"1\"; dst:\"<IP>\"; hll_key:\"3383197236451420632\"; layer_name:\"<name>\"; layer_name:\"<name>\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; layer_uuid:\"3866c7f4-f88d-402e-abde-252a2426d1d7\"; match_id:\"48\"; match_id:\"16777222\"; parent_rule:\"0\"; parent_rule:\"0\"; rule_action:\"Accept\"; rule_action:\"Accept\"; rule_name:\"Outbound access\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; rule_uid:\"4eb09b29-ccc2-4374-b33a-e66660e3916d\"; nat_addtnl_rulenum:\"0\"; nat_rulenum:\"400\"; product:\"VPN-1 & FireWall-1\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\"; src:\"<IP>\"; xlatedport:\"0\"; xlatedst:\"<IP>\"; xlatesport:\"28650\"; xlatesrc:\"<IP>\"]"
+    examples:
+      - message: "CheckPoint 9929 - [action:\"Reject\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; match_id:\"48\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\";]"
+        expect:
+          tokens:
+            action: Reject
+            contextnum: 1
+            service_id: https
+          absent_properties:
+            - event.type
+            - threat.level
 anchors:
   - anchor:
     id: DA46E37F-E30F-61B0-6288-052037C38628
@@ -221,6 +248,44 @@ When a pattern is subclassed it automatically inherits all the tokens declared i
 
 All tokens are local to the rules file.
 
+## Rule examples and validation
+
+Patterns can declare one or more `examples:` entries. Each example has a `message` and may have an `expect` block.
+
+```yaml
+examples:
+  - message: "msg action=Accept vendor=aws device=toy context=5"
+    expect:
+      tokens:
+        action: Accept
+        contextnum: 5
+      properties:
+        event.type: aws.toy
+        threat.level: danger
+      absent_properties:
+        - error.message
+```
+
+Validation happens after all rule files have been loaded, not one file at a time. This matters because the parser must detect cross-rule conflicts as well as per-rule correctness.
+
+For each example, the loader verifies that:
+
+1. the message matches exactly one rule in the loaded ruleset
+2. the matched rule is the rule that declared the example
+3. the matched pattern is the pattern that declared the example
+4. declared tokens can be extracted
+5. any values listed under `expect.tokens` match exactly
+6. any values listed under `expect.properties` are emitted
+7. any names listed under `absent_properties` are not emitted
+
+The older shorthand form
+
+```yaml
+example: "raw example message"
+```
+
+is still supported. It behaves like a minimal validation case: the declaring pattern must match, tokens must extract successfully, and property evaluation must not fail.
+
 This currently works onn the basis that
 
 1. All tokens in a rule execute the `Regex` for the token only once
@@ -231,7 +296,7 @@ This currently works onn the basis that
 2. More complex patterns are evaluated first.
    1. Patterns are sorted to guarantee that specific patterns are tried over generic ones
       1. for complexity (number of tokens)
-      2. then by precedence
+      2. then by precedence, where a lower numeric precedence value is tried first
 3. Properties can be specified either as
    1. Unconditional dynamically constructed properties that execute what the pattern matches
    2. Conditional properties that execute if the condition evaluates to `true`
@@ -296,9 +361,15 @@ patterns:
     tokens: [vendor,device_id,user,ip.incoming,file_name,event]
     properties:
       - property:
-        dynamic: if device_id == "toy" and file_name ?= "security" then event.name = vendor + "." + device_id and event.string = event + " to " + user else event.name = "AWS event"
-    example:
-      "aws toy: {user:barry,ip.incoming:192.168.167.12,file:/home/barry/security/permissions.cfg,event:Access denied}"
+        dynamic: if device_id == "toy" and file_name ?= "security" then even.name = vendor + "." + device_id and event.string = event + " to " + user else event.name = "AWS event"
+    examples:
+      - message: "aws toy: {user:barry,ip.incoming:192.168.167.12,file:/home/barry/security/permissions.cfg,event:Access denied}"
+        expect:
+          tokens:
+            vendor: aws
+            device_id: toy
+          properties:
+            event.string: Access denied to barry
 ```
 
 The example above asserts two properties `event.name` and `event.string`. `event.name` will always be asserted if the pattern (or any derived pattern) matches. `event.string` is only asserted if the condition `device_id == "toy" and file_name ?= "security"` is true.
@@ -465,7 +536,7 @@ This will produce the file [parsed.json](parsed.json)
 1. add the notion of `normalized` tokens values by creating a global token store that can be used to normalize local rule tokens to global system tokens durning which phase value translation and mapping should take place.
    1. Add a facility to map `rule` token values to `normalized` system token values.
    2. Add a facility to map `normalized` rules token values to `system` tokens.
-2. fix validation for rules via example messages.
+2. extend the validation report so it can aggregate all example failures instead of stopping at the first one.
 
 ## Unit tests
 
@@ -474,6 +545,8 @@ The unit tests in `test/src` use Google Test and can be run by calling `make run
 ## Command line
 
 The POC parser is setup to read in a database of rules as a file structure of `*.yaml` files and log files as a directory structure of `*.log` files.
+
+Rule loading validates all declared examples before parsing begins. If any example matches the wrong rule, the wrong pattern, multiple rules, or produces unexpected token/property values, rule loading fails.
 
 ```bash
   $ ./build/parser -r rules -l logs
@@ -543,15 +616,15 @@ Note that the property in `CheckPoint Accepted` and that the value of `contextnu
       },
 ```
 
-The same command with the value `action:"Reject";` in the message string will trigger a derived rule and produce the result (with the same tokens but without the dynamic properties)
+The same command with the value `action:"Reject";` in the message string will trigger the rejected derived rule and produce the result (with the same tokens but without the dynamic properties)
 
 ```json
 {
   "parsed": [
     {
       "event": {
-        "name": "CheckPoint",
-        "pattern_id": "AB9107D4-DAF0-1004-D61E-00000A03200B"
+        "name": "CheckPoint Rejected",
+        "pattern_id": "3927EB41-29B8-C62E-648E-DB5F4C4C2E67"
       },
       "rule": {
         "id": "AAE7F45F-DAF0-1004-D61E-00000A03200B",
@@ -568,7 +641,12 @@ The same command with the value `action:"Reject";` in the message string will tr
         "layer_uuid": "9d7748a0-845f-491d-9eef-1fb41680bc35",
         "loguid": "{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}",
         "match_id": 48,
+        "port": 44853,
+        "protocol": 6,
+        "rule_id": "8bf81033-b6c7-44fe-a88a-2068c155f50e",
         "sequencenum": 110,
+        "service": 443,
+        "service_id": "https",
         "time": 1630417161,
         "version": 5
       }
