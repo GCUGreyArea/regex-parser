@@ -2,9 +2,7 @@
 
 ## TODO
 
-1. Optimise conditional logic by creating fixed types via inheritance
-2. Create a Docker build to run the build and test in a container environment.
-3. Fix issues with benchmark tests
+See [TODO.md](TODO.md).
 
 ## Notice
 
