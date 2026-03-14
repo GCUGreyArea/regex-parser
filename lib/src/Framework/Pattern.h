@@ -36,11 +36,10 @@ public:
         }
 
         for(auto dn : mDynamics) {
-            if(dn->evaluate()) {
-                const auto& vec = dn->get_results();
-                for(auto d : vec) {
-                    props.push_back(d);
-                }
+            dn->evaluate();
+            const auto& vec = dn->get_results();
+            for(auto d : vec) {
+                props.push_back(d);
             }
         }
 

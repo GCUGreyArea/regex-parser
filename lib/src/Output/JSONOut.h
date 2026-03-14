@@ -10,6 +10,9 @@
 
 class JSONOut : public Output {
 public:
+    JSONOut()
+        : mIdx(0) {}
+
     virtual void add_rule_value(Rule& r) {
         Pattern *p = r.matched();
         if(p != nullptr) {
