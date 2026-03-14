@@ -31,7 +31,13 @@ Conditional logic and properties are only evaluated once a pattern has matched.
 unite tests can be run by executing the command 
 
 ```shell
-$ ./test/build/test_parser
+$ make test-run
+```
+
+The test binaries are built with AddressSanitizer. LeakSanitizer can fail under traced environments such as some IDEs, debuggers, and automated agent runners, so the default run target disables leak detection. To run leak detection explicitly outside those environments, use:
+
+```shell
+$ make test-leak-check
 ```
 
 ## Build requirements

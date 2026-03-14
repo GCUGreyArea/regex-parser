@@ -17,6 +17,7 @@ LINK      := -L$(LNK_PATH) -lgtest -lpthread -lglog
 LIBRARIES = -lre2 -lhs
 CFLAGS   = -std=c11 -Wall -g -fsanitize=address 
 CXXFLAGS = -std=c++17 -Wall -g -O1 -fsanitize=address $(INC)
+TEST_RUN_ENV ?= ASAN_OPTIONS=detect_leaks=0
 
 ifeq ($(UNAME), Darwin)
 CC       = cc
@@ -46,8 +47,10 @@ $(BUILD)/%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -c $< -o $@
 
 run:
-	./$(BUILD)/$(TARGET)
+	cd .. && $(TEST_RUN_ENV) ./test/$(BUILD)/$(TARGET)
+
+leak-check:
+	cd .. && ASAN_OPTIONS=detect_leaks=1 ./test/$(BUILD)/$(TARGET)
 
 clean:
 	rm -rf $(BUILD)
-

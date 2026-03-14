@@ -82,6 +82,12 @@ test: $(TESTTARGET)
 	cd $(LIBDIR) && make
 	cd $(TESTDIR) && make
 
+test-run: $(TESTTARGET)
+	cd $(TESTDIR) && make run
+
+test-leak-check: $(TESTTARGET)
+	cd $(TESTDIR) && make leak-check
+
 benchmark: $(BNCTARGET)
 	cd $(LIBDIR) && make
 	cd $(BENCHDIR) && make
@@ -105,4 +111,3 @@ help:
 	@echo "\tyaml-cpp availible at https://github.com/jbeder/yaml-cpp"
 	@echo "============================================================================================="
 	@echo "\n\n"
-
