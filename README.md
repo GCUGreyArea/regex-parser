@@ -235,15 +235,48 @@ This currently works onn the basis that
 3. Properties can be specified either as
    1. Unconditional dynamically constructed properties that execute what the pattern matches
    2. Conditional properties that execute if the condition evaluates to `true`
-      1. These have the form `if` `then` `else` which can use `or` in the conditional clause and `and` in the assignment clauses
-      2. The parser uses space as the delineator in the expression elements
-         1. the clause `if device_id == "toy"` is valid
-         2. the clause `if device_id=="toy"` is not
+      1. These use a small expression language parsed with a generated lexer/parser
+      2. Conditions support `and`, `or`, parentheses, `==`, `!=`, `<`, `<=`, `>`, `>=`, and `?=` for string contains
+      3. Assignment expressions support string concatenation and integer arithmetic with `+`, `-`, `*`, and `/`
+      4. Whitespace is not semantically significant, so both `if device_id == "toy"` and `if(device_id=="toy")` are valid
    3. Note that a property (whether it is dynamic or not) will only be evaluated if (and only if) the pattern matches. If an assert (as in pattern `1950E2A8-D49F-1CF4-DB2B-8B37B61CFBC0` above) states that the `action` must equal `Accept`, the pattern will only match when the field value for `action` is `Accept`.
 
 ## Dynamic properties based on conditional logic
 
 Dynamic logic can be used to assert property values by attaching a dynamic property clause to the pattern. Properties are inherited when the pattern is extended, as in the bellow example.
+
+Dynamic properties are evaluated after a pattern has matched and after token values have been extracted. The `dynamic:` clause is compiled once when the YAML rule is loaded and then executed for each match.
+
+The dynamic property language has the form:
+
+```text
+if <condition> then <assignment> [and <assignment> ...] [else <assignment> [and <assignment> ...]]
+```
+
+Where:
+
+1. Identifiers in conditions and on the right-hand side of assignments resolve to token names from the rule.
+2. Identifiers on the left-hand side of assignments are output property names.
+3. String literals must be quoted.
+4. Integer literals are supported in decimal, octal, binary, and hexadecimal forms, consistent with the rest of the parser.
+5. Property values cannot currently be referenced from other dynamic property expressions. The runtime only resolves token values and literals.
+
+Operator support:
+
+1. Boolean: `and`, `or`, `(`, `)`
+2. Comparison: `==`, `!=`, `<`, `<=`, `>`, `>=`, `?=`
+3. Arithmetic/value composition: `+`, `-`, `*`, `/`
+
+Operator precedence:
+
+1. Parentheses
+2. `*` and `/`
+3. `+` and `-`
+4. Comparison operators
+5. `and`
+6. `or`
+
+The `?=` operator means "contains". For example, `file_name ?= "security"` is true when the extracted token `file_name` contains the substring `security`.
 
 ```yaml
 iid: 5F175E9A-5C85-1176-810A-89A9E5CBDEA1
@@ -263,12 +296,29 @@ patterns:
     tokens: [vendor,device_id,user,ip.incoming,file_name,event]
     properties:
       - property:
-        dynamic: if device_id == "toy" and file_name ?= "security" then even.name = vendor + "." + device_id and event.string = event + " to " + user else event.name = "AWS event"
+        dynamic: if device_id == "toy" and file_name ?= "security" then event.name = vendor + "." + device_id and event.string = event + " to " + user else event.name = "AWS event"
     example:
       "aws toy: {user:barry,ip.incoming:192.168.167.12,file:/home/barry/security/permissions.cfg,event:Access denied}"
 ```
 
 The example above asserts two properties `event.name` and `event.string`. `event.name` will always be asserted if the pattern (or any derived pattern) matches. `event.string` is only asserted if the condition `device_id == "toy" and file_name ?= "security"` is true.
+
+This example also shows two important details:
+
+1. Multiple assignments in the `then` or `else` branch are separated by `and`.
+2. Value expressions can combine token values and literals, for example `vendor + "." + device_id`.
+
+The following is also valid and demonstrates precedence and parentheses:
+
+```yaml
+dynamic: if action == "Accept" and (contextnum >= 3 or vendor == "azure") then event.signature = vendor + "." + device_id and score = contextnum + 2 * 3 else event.signature = vendor + ".fallback" and score = (contextnum + 2) * 3
+```
+
+In that expression:
+
+1. `2 * 3` is evaluated before the surrounding addition.
+2. `(contextnum >= 3 or vendor == "azure")` is grouped explicitly.
+3. The `else` branch is optional, but when present it uses the same assignment syntax as the `then` branch.
 
 The following messages (taken from `logs/CheckPoint.log` will both trigger the `event.name` and the `event.string` property based on the above rule because the extracted field `file_name` contains the string `security` and the `device_id` field evaluates to `toy`.
 
