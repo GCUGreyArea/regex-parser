@@ -2,29 +2,29 @@
 
 ## TODO
 
-1. Optimise conditional logic be creating fixed types via inheritance
-2. Create Docker build to run build and test in container environment.
+1. Optimise conditional logic by creating fixed types via inheritance
+2. Create a Docker build to run the build and test in a container environment.
 3. Fix issues with benchmark tests
 
 ## Notice
 
-This is a proof of concept application to demonstrate a principal in the architecture of parsing. It does not have a framework and has not been written to be efficient or to production standards.
+This is a proof-of-concept application to demonstrate a principle in the architecture of parsing. It does not have a framework and has not been written to be efficient or to production standards.
 
 ## Terminology
 
-*Extraction field*: Some unique, usually labeled, portion of a message to be parsed and extracted such as `interface:eth0` or `interface=eth0` where the field would be `interface` and it's value would be `eth0`. In the wider context a field can be simply positional. An example of this would a CEF message where field values are distinguished by the order they appear in and their delineator.
+*Extraction field*: Some unique, usually labelled, portion of a message to be parsed and extracted, such as `interface:eth0` or `interface=eth0`, where the field would be `interface` and its value would be `eth0`. In the wider context, a field can be simply positional. An example of this would be a CEF message where field values are distinguished by the order they appear in and their delineator.
 
 ## How it works
 
-The parser works on the principal that if a regular expression can uniquely identify a message type, then the only things that remains is to extract the field values.
+The parser works on the principle that if a regular expression can uniquely identify a message type, then the only thing that remains is to extract the field values.
 
-Fields are represented by individual regex patterns, and the pattern groups these together in an ordered list. When the pattern is extended by inheritance the new pattern inherits the original pattern's field list, adding it's own fields as needed!
+Fields are represented by individual regex patterns, and the pattern groups these together in an ordered list. When the pattern is extended by inheritance, the new pattern inherits the original pattern's field list, adding its own fields as needed!
 
-If a property is declared in a pattern, and the pattern ios then inherited, the property is also inherited and will be asserted and triggered if the pattern matches.
+If a property is declared in a pattern, and the pattern is then inherited, the property is also inherited and will be asserted and triggered if the pattern matches.
 
-The parser uses `hyperscan` to identify that an anchor pattern matches, then uses the index from that to try the rule. It will asses the more complex patterns first, then on failure fall back to less complex ones. A massive efficiency gain could be created by using hyprescan to match the entire pattern, then scheduling the RE2 or PCRE2 to extract the tokens.
+The parser uses `hyperscan` to identify that an anchor pattern matches, then uses the index from that to try the rule. It will assess the more complex patterns first, then, on failure, fall back to less complex ones. A massive efficiency gain could be created by using hyprescan to match the entire pattern, then scheduling the RE2 or PCRE2 to extract the tokens.
 
-Conditional logic and properties are only evaluated one a pattern has matched.
+Conditional logic and properties are only evaluated once a pattern has matched.
 
 ### Unit tests
 
@@ -36,7 +36,7 @@ $ ./test/build/test_parser
 
 ## Build requirements
 
-The project requiresthe following to be instaled and correctly configured 
+The project requiresthe following to be installed and correctly configured 
 
 - [Google test](https://github.com/google/googletest) 
 - [Google benchmark](https://github.com/google/benchmark) though to be fair at the moment [Google benchmark](https://github.com/google/benchmark) isn't doing very much.
@@ -44,11 +44,11 @@ The project requiresthe following to be instaled and correctly configured
 - [JSON C++ library](https://github.com/nlohmann/json): This is also a single hedaer solution and the above also applies here.
 
 
-Both these libraries have their own requirements, but these are minimal in so far as they require `pthreads` to be installed and to link.
+Both these libraries have their own requirements, but these are minimal insofar as they require `pthreads` to be installed and to link.
 
 ## Limitations
 
-- All rules are hierarchical and patterns cannot be reused by other rules.
+- All rules are hierarchical, and patterns cannot be reused by other rules.
 - There is no notion of recursion or of a parser fragment.
 - The `YamlFile` class does not do any error checking outside the extent of throwing an exception on errors.
 - No account is taken of fields that appear more than once.
@@ -58,17 +58,17 @@ Both these libraries have their own requirements, but these are minimal in so fa
 The rule definition in `rules/CheckPoint/CheckPoint.yaml` is a rule that
 
 1. Classifies the message `CheckPoint 9929 - [action:"Accept"; conn_direction:"Outgoing"; contextnum:"5"; flags:"7263232"; ifdir:"outbound"; ifname:"eth2"; logid:"0"; loguid:"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}"; origin:"<IP>"; originsicname:"CN=Ord1fw1b,O=bos1cpmgmt1.aspect.com.2twi3g"; sequencenum:"110"; time:"1630417161"; version:"5"; __policy_id_tag:"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\]"; context_num:"1"; dst:"<IP>"; hll_key:"3383197236451420632"; layer_name:"<name>"; layer_name:"<name>"; layer_uuid:"9d7748a0-845f-491d-9eef-1fb41680bc35"; layer_uuid:"3866c7f4-f88d-402e-abde-252a2426d1d7"; match_id:"48"; match_id:"16777222"; parent_rule:"0"; parent_rule:"0"; rule_action:"Accept"; rule_action:"Accept"; rule_name:"Outbound access"; rule_uid:"8bf81033-b6c7-44fe-a88a-2068c155f50e"; rule_uid:"4eb09b29-ccc2-4374-b33a-e66660e3916d"; nat_addtnl_rulenum:"0"; nat_rulenum:"400"; product:"VPN-1 & FireWall-1"; proto:"6"; s_port:"44853"; service:"443"; service_id:"https"; src:"<IP>"; xlatedport:"0"; xlatedst:"<IP>"; xlatesport:"28650"; xlatesrc:"<IP>"]`
-2. extracts fields form the message
+2. extracts fields from the message
 
-It differentiates based on the value of the field `action` in two sub patterns that assert the events `CheckPoint Accepted` and `CheckPoint Rejected`.
+It differentiates based on the value of the field `action` in two sub-patterns that assert the events `CheckPoint Accepted` and `CheckPoint Rejected`.
 
 Rules are expressed such that a rule can either
 
 1. Declare a single pattern that generates an event by asserting the name given to the rule
 2. Declare a base pattern that can be inherited from, in order to
    1. add tokens
-   2. assert values for tokens (the pattern will only match if the token as the asserted value)
-   3. assert the name of the pattern as the event - this happens automatically when a sub pattern matches
+   2. assert values for tokens (the pattern will only match if the token has the asserted value)
+   3. assert the name of the pattern as the event - this happens automatically when a sub-pattern matches
 3. Assert properties if and only if the pattern matches
    1. As dynamically constructed objects based on extracted field values
    2. Through conditional logic as dynamically constructed objects based on extracted field values
@@ -219,11 +219,11 @@ This currently works onn the basis that
 
 1. All tokens in a rule execute the `Regex` for the token only once
    1. patterns that share tokens share the token object as an `std::shared_ptr`.
-   2. when a match is found for a token is set to `matched`.
-   3. When an `assert` is found the regex is substituted to create a new more specific regex pattern for that search. The underlying regex is not changed.
+   2. When a match is found for a token, it is set to `matched`.
+   3. When an `assert` is found, the regex is substituted to create a new, more specific regex pattern for that search. The underlying regex is not changed.
    4. If a subclassed pattern matches, but the assert fails, then another subclassed pattern, which declares a different `assert` is assessed for the same token.
-2. More complex pattern are evaluated first.
-   1. Patterns sorted to guaranty that specific patterns are tried over generic ones
+2. More complex patterns are evaluated first.
+   1. Patterns are sorted to guarantee that specific patterns are tried over generic ones
       1. for complexity (number of tokens)
       2. then by precedence
 3. Properties can be specified either as
@@ -233,7 +233,7 @@ This currently works onn the basis that
       2. The parser uses space as the delineator in the expression elements
          1. the clause `if device_id == "toy"` is valid
          2. the clause `if device_id=="toy"` is not
-   3. Note that a property (wether it si dynamic or not) will only be evaluated if (and only if) the pattern matches. If an assert (as in pattern `1950E2A8-D49F-1CF4-DB2B-8B37B61CFBC0` above) states that that `action` must equal `Accept`, the pattern will only match when the field value for `action` is `Accept`.
+   3. Note that a property (whether it is dynamic or not) will only be evaluated if (and only if) the pattern matches. If an assert (as in pattern `1950E2A8-D49F-1CF4-DB2B-8B37B61CFBC0` above) states that the `action` must equal `Accept`, the pattern will only match when the field value for `action` is `Accept`.
 
 ## Dynamic properties based on conditional logic
 
@@ -253,7 +253,7 @@ patterns:
     type: root
     anchor: DA46E37F-E30F-61B0-6288-052037C38628
     match: sequential
-    # Tokens and properties will be inherited by anything pattern that extends this pattern
+    # Tokens and properties will be inherited by anything that extends this pattern
     tokens: [vendor,device_id,user,ip.incoming,file_name,event]
     properties:
       - property:
