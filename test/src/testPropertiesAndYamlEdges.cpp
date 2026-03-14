@@ -79,6 +79,37 @@ TEST(testProperties, testResolvedPropertiesRefreshAcrossMatchesAndAreWrittenToJs
     ASSERT_EQ(json["parsed"][1]["property"]["threat.level"], "low");
 }
 
+TEST(testProperties, testDynamicGrammarSupportsPrecedenceParenthesesAndElseAssignments) {
+    std::unique_ptr<Rule> rule = load_rule("test/resources/dynamic_grammar.yaml");
+
+    Match first("msg action=Accept vendor=aws device=toy context=5");
+    ASSERT_TRUE(rule->match(first));
+
+    Pattern * pattern = rule->matched();
+    ASSERT_NE(pattern, nullptr);
+    auto first_properties = to_map(pattern->get_properties());
+    ASSERT_EQ(first_properties["event.signature"], "aws.toy");
+    ASSERT_EQ(first_properties["score"], "11");
+
+    Match second("msg action=Accept vendor=azure device=box context=1");
+    ASSERT_TRUE(rule->match(second));
+
+    pattern = rule->matched();
+    ASSERT_NE(pattern, nullptr);
+    auto second_properties = to_map(pattern->get_properties());
+    ASSERT_EQ(second_properties["event.signature"], "azure.box");
+    ASSERT_EQ(second_properties["score"], "7");
+
+    Match third("msg action=Reject vendor=aws device=toy context=1");
+    ASSERT_TRUE(rule->match(third));
+
+    pattern = rule->matched();
+    ASSERT_NE(pattern, nullptr);
+    auto third_properties = to_map(pattern->get_properties());
+    ASSERT_EQ(third_properties["event.signature"], "aws.fallback");
+    ASSERT_EQ(third_properties["score"], "9");
+}
+
 TEST(testPatternModes, testRandomMatchModeAllowsOutOfOrderTokens) {
     constexpr const char * ANCHOR_ID = "A-RANDOM-ANCHOR";
     constexpr const char * PATTERN_ID = "A-RANDOM-PATTERN";
@@ -112,5 +143,10 @@ TEST(testYamlErrors, testUnknownMatchTypeThrows) {
 
 TEST(testYamlErrors, testInvalidDynamicExpressionThrows) {
     YamlFile fl("test/resources/invalid_dynamic.yaml");
+    ASSERT_THROW(fl.readFile(), Exception::General);
+}
+
+TEST(testYamlErrors, testUnknownIdentifierInDynamicExpressionThrows) {
+    YamlFile fl("test/resources/invalid_unknown_identifier.yaml");
     ASSERT_THROW(fl.readFile(), Exception::General);
 }

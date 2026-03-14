@@ -13,6 +13,7 @@
  *
  */
 
+#include <memory>
 #include <vector>
 #include "Assignment.h"
 #include "Variable.h"
@@ -21,10 +22,31 @@
 
 class ConditionalAssignment {
 public:
+    class ConditionEvaluator {
+    public:
+        virtual ~ConditionEvaluator() = default;
+        virtual bool evaluate() = 0;
+    };
+
+    class AssignmentEvaluator {
+    public:
+        virtual ~AssignmentEvaluator() = default;
+        virtual ResolvedProperty evaluate() = 0;
+        virtual std::string name() const = 0;
+    };
+
     ConditionalAssignment(std::shared_ptr<BoolExpression> ifEx, std::vector<std::shared_ptr<Assignment>> thenEx, std::vector<std::shared_ptr<Assignment>> elseEx = {})
-        : mExp(ifEx)
-        , mThen(thenEx)
-        , mElse(elseEx)
+        : mExp(std::make_shared<LegacyConditionEvaluator>(std::move(ifEx)))
+        , mThen(adapt_assignments(thenEx))
+        , mElse(adapt_assignments(elseEx))
+        , mResults()
+        , mRet(false) {}
+
+    ConditionalAssignment(std::shared_ptr<ConditionEvaluator> ifEx, std::vector<std::shared_ptr<AssignmentEvaluator>> thenEx, std::vector<std::shared_ptr<AssignmentEvaluator>> elseEx = {})
+        : mExp(std::move(ifEx))
+        , mThen(std::move(thenEx))
+        , mElse(std::move(elseEx))
+        , mResults()
         , mRet(false) {}
 
 
@@ -41,14 +63,12 @@ public:
 
         if(mRet) {
             for(auto& a : mThen) {
-                std::shared_ptr<Variable> v = a->evaluate();
-                mResults.push_back({v->name(), v->as_string()});
+                mResults.push_back(a->evaluate());
             }
         }
         else {
             for(auto& a : mElse) {
-                std::shared_ptr<Variable> v = a->evaluate();
-                mResults.push_back({v->name(), v->as_string()});
+                mResults.push_back(a->evaluate());
             }
         }
 
@@ -71,24 +91,61 @@ public:
         std::vector<ResolvedProperty> props {};
 
         for(auto as : mThen) {
-            std::shared_ptr<Variable> var = as->get_assignmet_variable();
-            props.push_back({var->name(), var->as_string()});
+            props.push_back({as->name(), ""});
         }
 
         for(auto as : mElse) {
-            std::shared_ptr<Variable> var = as->get_assignmet_variable();
-            props.push_back({var->name(), var->as_string()});
+            props.push_back({as->name(), ""});
         }
 
         return props;
     }
 
-protected:
-
 private:
-    std::shared_ptr<BoolExpression> mExp;
-    std::vector<std::shared_ptr<Assignment>> mThen;     // Could be multiple assignments
-    std::vector<std::shared_ptr<Assignment>> mElse;
+    class LegacyConditionEvaluator : public ConditionEvaluator {
+    public:
+        explicit LegacyConditionEvaluator(std::shared_ptr<BoolExpression> expression)
+            : mExpression(std::move(expression)) {}
+
+        bool evaluate() override {
+            return mExpression->evaluate();
+        }
+
+    private:
+        std::shared_ptr<BoolExpression> mExpression;
+    };
+
+    class LegacyAssignmentEvaluator : public AssignmentEvaluator {
+    public:
+        explicit LegacyAssignmentEvaluator(std::shared_ptr<Assignment> assignment)
+            : mAssignment(std::move(assignment)) {}
+
+        ResolvedProperty evaluate() override {
+            std::shared_ptr<Variable> value = mAssignment->evaluate();
+            return {value->name(), value->as_string()};
+        }
+
+        std::string name() const override {
+            return mAssignment->get_assignmet_variable()->name();
+        }
+
+    private:
+        std::shared_ptr<Assignment> mAssignment;
+    };
+
+    static std::vector<std::shared_ptr<AssignmentEvaluator>> adapt_assignments(const std::vector<std::shared_ptr<Assignment>>& assignments) {
+        std::vector<std::shared_ptr<AssignmentEvaluator>> ret;
+        ret.reserve(assignments.size());
+        for(const auto& assignment : assignments) {
+            ret.push_back(std::make_shared<LegacyAssignmentEvaluator>(assignment));
+        }
+
+        return ret;
+    }
+
+    std::shared_ptr<ConditionEvaluator> mExp;
+    std::vector<std::shared_ptr<AssignmentEvaluator>> mThen;     // Could be multiple assignments
+    std::vector<std::shared_ptr<AssignmentEvaluator>> mElse;
     std::vector<ResolvedProperty> mResults;
     bool mRet;
 };

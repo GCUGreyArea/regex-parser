@@ -66,7 +66,7 @@ public:
             case NOT_EQUAL:        return  mLhs != mRhs;
             case STR_CONTAINS: {
                 if(mRhs.type() == ValueType::STRING && mLhs.type() == ValueType::STRING)
-                    return mRhs.as_string().find(mLhs.as_string());
+                    return mLhs.as_string().find(mRhs.as_string()) != std::string::npos;
 
                 return false;
             }
@@ -98,15 +98,15 @@ public:
     }
 
     void set_rhs(std::shared_ptr<Token> v) {
-        mLhs.set(v);
+        mRhs.set(v);
     }
 
     void set_rhs(std::string v) {
-        mLhs.set(v);
+        mRhs.set(v);
     }
 
     void set_rhs(int v) {
-        mLhs.set(v);
+        mRhs.set(v);
     }
 
     bool valid() {

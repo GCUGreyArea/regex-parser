@@ -103,3 +103,20 @@ TEST(testPaths,testThatPathsGetBuilt) {
     ASSERT_EQ(1,v.size());
     ASSERT_EQ(2,v.at(0));
 }
+
+TEST(testPaths, testPathsReportUniqueTokensAndMissingPaths) {
+    std::vector<std::vector<size_t>> patterns = {
+        {2, 0, 3},
+        {1, 3},
+        {4, 0}
+    };
+
+    RootPath root(patterns);
+
+    std::vector<size_t> unique = root.get_unique_tokens();
+    std::sort(unique.begin(), unique.end());
+
+    ASSERT_EQ(unique, (std::vector<size_t>{0, 1, 2, 3, 4}));
+    ASSERT_TRUE(root.path_has_pattern({9}).empty());
+    ASSERT_TRUE(root.path_has_tokens({9}).empty());
+}

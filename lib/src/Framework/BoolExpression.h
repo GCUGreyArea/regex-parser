@@ -94,6 +94,9 @@ public:
             // OR will try rhs, AND will fail
             if(!res)
                 return res;
+        if(mConj == OR)
+            if(res)
+                return res;
 
         if(mRhsExp)
             res = mRhsExp->evaluate();

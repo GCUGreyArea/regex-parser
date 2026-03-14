@@ -46,7 +46,7 @@ public:
 
     bool contains(std::string str) {
         std::string tk = mRegex.as_string();
-        return tk.find(str);
+        return tk.find(str) != std::string::npos;
     }
 
     bool operator==(const Token &other) const;
