@@ -16,9 +16,8 @@
 #include <vector>
 #include "Assignment.h"
 #include "Variable.h"
-#include "BaseProperty.h"
-#include "PropertyValue.h"
 #include "BoolExpression.h"
+#include "ResolvedProperty.h"
 
 class ConditionalAssignment {
 public:
@@ -43,17 +42,13 @@ public:
         if(mRet) {
             for(auto& a : mThen) {
                 std::shared_ptr<Variable> v = a->evaluate();
-                std::shared_ptr<PropertyValue> val = std::make_shared<PropertyValue>(v);
-
-                mResults.push_back(val);
+                mResults.push_back({v->name(), v->as_string()});
             }
         }
         else {
             for(auto& a : mElse) {
                 std::shared_ptr<Variable> v = a->evaluate();
-                std::shared_ptr<PropertyValue> val = std::make_shared<PropertyValue>(v);
-
-                mResults.push_back(val);
+                mResults.push_back({v->name(), v->as_string()});
             }
         }
 
@@ -64,29 +59,25 @@ public:
      * @brief Get the values object as a reference so that when it is updated
      * the list will be remade
      *
-     * @return std::vector<std::shared_ptr<BaseProperty>>&
+     * @return std::vector<ResolvedProperty>&
      */
 
-    std::vector<std::shared_ptr<BaseProperty>>& get_results() {
+    std::vector<ResolvedProperty>& get_results() {
         return mResults;
     }
 
 
-    std::vector<std::shared_ptr<BaseProperty>> get_expression_properies() {
-        std::vector<std::shared_ptr<BaseProperty>> props {};
+    std::vector<ResolvedProperty> get_expression_properies() {
+        std::vector<ResolvedProperty> props {};
 
         for(auto as : mThen) {
             std::shared_ptr<Variable> var = as->get_assignmet_variable();
-            std::shared_ptr<BaseProperty> val = std::make_shared<PropertyValue>(var);
-
-            props.push_back(val);
+            props.push_back({var->name(), var->as_string()});
         }
 
         for(auto as : mElse) {
             std::shared_ptr<Variable> var = as->get_assignmet_variable();
-            std::shared_ptr<BaseProperty> val = std::make_shared<PropertyValue>(var);
-
-            props.push_back(val);
+            props.push_back({var->name(), var->as_string()});
         }
 
         return props;
@@ -98,7 +89,7 @@ private:
     std::shared_ptr<BoolExpression> mExp;
     std::vector<std::shared_ptr<Assignment>> mThen;     // Could be multiple assignments
     std::vector<std::shared_ptr<Assignment>> mElse;
-    std::vector<std::shared_ptr<BaseProperty>> mResults;
+    std::vector<ResolvedProperty> mResults;
     bool mRet;
 };
 
