@@ -14,7 +14,23 @@ patterns:
     # Tokens in this declaration will be evaluated in the order they are specified 'flags' coming before 'action' would cause the pattern fail
     match: sequential
     tokens: [action,direction,contextnum,flags,ifdir,ifname,loguid,sequencenum,time,version,database_tag,layer_uuid,match_id]
-    example: "CheckPoint 9929 - [action:\"Accept\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; logid:\"0\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; origin:\"<IP>\"; originsicname:\"CN=Ord1fw1b,O=bos1cpmgmt1.aspect.com.2twi3g\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; context_num:\"1\"; dst:\"<IP>\"; hll_key:\"3383197236451420632\"; layer_name:\"<name>\"; layer_name:\"<name>\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; layer_uuid:\"3866c7f4-f88d-402e-abde-252a2426d1d7\"; match_id:\"48\"; match_id:\"16777222\"; parent_rule:\"0\"; parent_rule:\"0\"; rule_action:\"Accept\"; rule_action:\"Accept\"; rule_name:\"Outbound access\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; rule_uid:\"4eb09b29-ccc2-4374-b33a-e66660e3916d\"; nat_addtnl_rulenum:\"0\"; nat_rulenum:\"400\"; product:\"VPN-1 & FireWall-1\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\"; src:\"<IP>\"; xlatedport:\"0\"; xlatedst:\"<IP>\"; xlatesport:\"28650\"; xlatesrc:\"<IP>\"]"
+    examples:
+      - message: "CheckPoint 9929 - [action:\"Drop\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; match_id:\"48\";]"
+        expect:
+          tokens:
+            action: Drop
+            direction: Outgoing
+            contextnum: 1
+            flags: 7263232
+            ifdir: outbound
+            ifname: eth2
+            loguid: "{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}"
+            sequencenum: 110
+            time: 1630417161
+            version: 5
+            database_tag: 599255D7-8B94-704F-9D9A-CFA3719EA5CE
+            layer_uuid: 9d7748a0-845f-491d-9eef-1fb41680bc35
+            match_id: 48
     # A property in this model applies to a pattern and concatenates values and token values
   - id: 1950E2A8-D49F-1CF4-DB2B-8B37B61CFBC0
     name: CheckPoint Accepted
@@ -37,7 +53,20 @@ patterns:
         tokens: [action,service_id]
       - property:
         dynamic: if contextnum >= 3 then threat.level = "danger"
-    example: "CheckPoint 9929 - [action:\"Reject\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; logid:\"0\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; origin:\"<IP>\"; originsicname:\"CN=Ord1fw1b,O=bos1cpmgmt1.aspect.com.2twi3g\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; context_num:\"1\"; dst:\"<IP>\"; hll_key:\"3383197236451420632\"; layer_name:\"<name>\"; layer_name:\"<name>\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; layer_uuid:\"3866c7f4-f88d-402e-abde-252a2426d1d7\"; match_id:\"48\"; match_id:\"16777222\"; parent_rule:\"0\"; parent_rule:\"0\"; rule_action:\"Accept\"; rule_action:\"Accept\"; rule_name:\"Outbound access\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; rule_uid:\"4eb09b29-ccc2-4374-b33a-e66660e3916d\"; nat_addtnl_rulenum:\"0\"; nat_rulenum:\"400\"; product:\"VPN-1 & FireWall-1\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\"; src:\"<IP>\"; xlatedport:\"0\"; xlatedst:\"<IP>\"; xlatesport:\"28650\"; xlatesrc:\"<IP>\"]"
+    examples:
+      - message: "CheckPoint 9929 - [action:\"Accept\"; conn_direction:\"Outgoing\"; contextnum:\"5\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; match_id:\"48\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\";]"
+        expect:
+          tokens:
+            action: Accept
+            contextnum: 5
+            rule_id: 8bf81033-b6c7-44fe-a88a-2068c155f50e
+            protocol: 6
+            port: 44853
+            service: 443
+            service_id: https
+          properties:
+            event.type: Accept.https
+            threat.level: danger
   - id: 3927EB41-29B8-C62E-648E-DB5F4C4C2E67
     name: CheckPoint Rejected
     desc: >-
@@ -50,7 +79,20 @@ patterns:
     assert:
       - token: action
         value: Reject
-    example: "CheckPoint 9929 - [action:\"Reject\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; logid:\"0\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; origin:\"<IP>\"; originsicname:\"CN=Ord1fw1b,O=bos1cpmgmt1.aspect.com.2twi3g\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; context_num:\"1\"; dst:\"<IP>\"; hll_key:\"3383197236451420632\"; layer_name:\"<name>\"; layer_name:\"<name>\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; layer_uuid:\"3866c7f4-f88d-402e-abde-252a2426d1d7\"; match_id:\"48\"; match_id:\"16777222\"; parent_rule:\"0\"; parent_rule:\"0\"; rule_action:\"Accept\"; rule_action:\"Accept\"; rule_name:\"Outbound access\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; rule_uid:\"4eb09b29-ccc2-4374-b33a-e66660e3916d\"; nat_addtnl_rulenum:\"0\"; nat_rulenum:\"400\"; product:\"VPN-1 & FireWall-1\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\"; src:\"<IP>\"; xlatedport:\"0\"; xlatedst:\"<IP>\"; xlatesport:\"28650\"; xlatesrc:\"<IP>\"]"
+    examples:
+      - message: "CheckPoint 9929 - [action:\"Reject\"; conn_direction:\"Outgoing\"; contextnum:\"1\"; flags:\"7263232\"; ifdir:\"outbound\"; ifname:\"eth2\"; loguid:\"{0x35904e9,0x4655026c,0xeafacc55,0x657c933c}\"; sequencenum:\"110\"; time:\"1630417161\"; version:\"5\"; __policy_id_tag:\"product=VPN-1 & FireWall-1[db_tag={599255D7-8B94-704F-9D9A-CFA3719EA5CE};mgmt=bos1cpmgmt01;date=1630333752;policy_name=<policy>\\]\"; layer_uuid:\"9d7748a0-845f-491d-9eef-1fb41680bc35\"; match_id:\"48\"; rule_uid:\"8bf81033-b6c7-44fe-a88a-2068c155f50e\"; proto:\"6\"; s_port:\"44853\"; service:\"443\"; service_id:\"https\";]"
+        expect:
+          tokens:
+            action: Reject
+            contextnum: 1
+            rule_id: 8bf81033-b6c7-44fe-a88a-2068c155f50e
+            protocol: 6
+            port: 44853
+            service: 443
+            service_id: https
+          absent_properties:
+            - event.type
+            - threat.level
 anchors:
   - anchor:
     id: DA46E37F-E30F-61B0-6288-052037C38628

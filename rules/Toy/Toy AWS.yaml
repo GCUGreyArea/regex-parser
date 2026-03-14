@@ -16,8 +16,21 @@ patterns:
     properties:
       - property:
         dynamic: if device_id == "toy" and file_name ?= "security" then even.name = vendor + "." + device_id and event.string = event + " to " + user else event.name = "AWS event"
-    example:
-      "aws toy: {user:barry,ip.incoming:192.168.167.12,file:/home/barry/security/permissions.cfg,event:Access denied}"
+    examples:
+      - message: "aws toy: {user:barry,ip.incoming:192.168.167.12,file:/home/barry/security/permissions.cfg,event:Access reviewed}"
+        expect:
+          tokens:
+            vendor: aws
+            device_id: toy
+            user: barry
+            ip.incoming: 192.168.167.12
+            file_name: /home/barry/security/permissions.cfg
+            event: Access reviewed
+          properties:
+            even.name: aws.toy
+            event.string: Access reviewed to barry
+          absent_properties:
+            - event.name
   - id: 2DAC1F35-864B-C244-A9D9-C3F4883423D8
     name: AWS Toy access denied
     desc: >-
@@ -29,7 +42,21 @@ patterns:
     assert:
       - token: event
         value: Access denied
-    example:
+    examples:
+      - message: "aws toy: {user:barry,ip.incoming:192.168.167.12,file:/home/barry/security/permissions.cfg,event:Access denied}"
+        expect:
+          tokens:
+            vendor: aws
+            device_id: toy
+            user: barry
+            ip.incoming: 192.168.167.12
+            file_name: /home/barry/security/permissions.cfg
+            event: Access denied
+          properties:
+            even.name: aws.toy
+            event.string: Access denied to barry
+          absent_properties:
+            - event.name
   - id: 3927EB41-29B8-C62E-648E-DB5F4C4C2E67
     name: AWS Toy access granted
     desc: >-
@@ -41,8 +68,21 @@ patterns:
     assert:
       - token: event
         value: Access granted
-    example:
-     "aws toy: {user:barry,ip.incoming:192.168.167.12,file:/home/barry/security/permissions.cfg,event:Access granted}"
+    examples:
+      - message: "aws toy: {user:barry,ip.incoming:192.168.167.12,file:/home/barry/security/permissions.cfg,event:Access granted}"
+        expect:
+          tokens:
+            vendor: aws
+            device_id: toy
+            user: barry
+            ip.incoming: 192.168.167.12
+            file_name: /home/barry/security/permissions.cfg
+            event: Access granted
+          properties:
+            even.name: aws.toy
+            event.string: Access granted to barry
+          absent_properties:
+            - event.name
 anchors:
   - anchor:
     id: DA46E37F-E30F-61B0-6288-052037C38628
@@ -73,4 +113,3 @@ tokens:
     name: event
     regex: event:([a-zA-Z ]+)
     type: string
-

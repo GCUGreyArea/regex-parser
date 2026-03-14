@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include <utility>
 
 #include <nlohmann/json.hpp>
 
@@ -14,6 +16,13 @@
 #include "ConditionalAssignment.h"
 #include "ResolvedProperty.h"
 
+struct PatternExample {
+    std::string message;
+    std::map<std::string, std::string> expected_tokens;
+    std::map<std::string, std::string> expected_properties;
+    std::vector<std::string> absent_properties;
+};
+
 class Pattern {
 public:
     Pattern(std::string name, std::string id, AnchorPattern& anchor, size_t precedence);
@@ -24,9 +33,13 @@ public:
     void add_conditional_assignment(std::shared_ptr<ConditionalAssignment> assignment) {
         mDynamics.push_back(assignment);
     }
+    void add_example(PatternExample example) {
+        mExamples.push_back(std::move(example));
+    }
 
     bool match(Match& m, bool anchor = true);
     std::vector<std::shared_ptr<Token>>& get_tokens() {return mTokens;}
+    const std::vector<PatternExample>& examples() const {return mExamples;}
 
     std::vector<ResolvedProperty> get_properties() {
         std::vector<ResolvedProperty> props{};
@@ -47,8 +60,8 @@ public:
     }
 
 
-    size_t num_tokens() {return mTokens.size();}
-    size_t precedence() {return mPrecedence;}
+    size_t num_tokens() const {return mTokens.size();}
+    size_t precedence() const {return mPrecedence;}
     void reset();
     bool matched();
 
@@ -72,6 +85,7 @@ private:
     Match::Type mMatchType;
     std::vector<Property> mProperties;
     std::vector<std::shared_ptr<ConditionalAssignment>> mDynamics;
+    std::vector<PatternExample> mExamples;
 
 };
 

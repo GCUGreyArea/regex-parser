@@ -17,6 +17,17 @@ std::unique_ptr<Rule> load_rule(const std::string& path) {
     return fl.getRule();
 }
 
+std::vector<std::unique_ptr<Rule>> load_rules(const std::vector<std::string>& paths) {
+    std::vector<std::unique_ptr<Rule>> rules;
+    for (const auto& path : paths) {
+        YamlFile fl(path);
+        fl.readFile();
+        rules.push_back(fl.getRule());
+    }
+
+    return rules;
+}
+
 std::unordered_map<std::string, std::string> to_map(const std::vector<ResolvedProperty>& properties) {
     std::unordered_map<std::string, std::string> values;
     for(const auto& property : properties) {
@@ -131,6 +142,30 @@ TEST(testPatternModes, testRandomMatchModeAllowsOutOfOrderTokens) {
     ASSERT_EQ(matched_tokens[2]->as_int(), 5);
 }
 
+TEST(testPatternOrdering, testLowerPrecedenceValueWinsWhenTokenCountsMatch) {
+    std::unique_ptr<Rule> rule = load_rule("test/resources/precedence_equal_tokens.yaml");
+
+    Match match("msg kind=event");
+    ASSERT_TRUE(rule->match(match));
+
+    Pattern * pattern = rule->matched();
+    ASSERT_NE(pattern, nullptr);
+    ASSERT_EQ(pattern->id(), "Z-LOW-PRECEDENCE");
+    ASSERT_EQ(pattern->name(), "Low Precedence Value");
+}
+
+TEST(testPatternOrdering, testMoreSpecificPatternWinsBeforePrecedenceComparison) {
+    std::unique_ptr<Rule> rule = load_rule("test/resources/precedence_token_count.yaml");
+
+    Match match("msg kind=event detail=full");
+    ASSERT_TRUE(rule->match(match));
+
+    Pattern * pattern = rule->matched();
+    ASSERT_NE(pattern, nullptr);
+    ASSERT_EQ(pattern->id(), "Z-SPECIFIC");
+    ASSERT_EQ(pattern->name(), "Specific Match");
+}
+
 TEST(testYamlErrors, testMissingTokenThrows) {
     YamlFile fl("test/resources/invalid_missing_token.yaml");
     ASSERT_THROW(fl.readFile(), Exception::TokenNotFound);
@@ -139,6 +174,50 @@ TEST(testYamlErrors, testMissingTokenThrows) {
 TEST(testYamlErrors, testUnknownMatchTypeThrows) {
     YamlFile fl("test/resources/invalid_match_type.yaml");
     ASSERT_THROW(fl.readFile(), Exception::UnknownMatchType);
+}
+
+TEST(testYamlExamples, testExamplesValidateTokensPropertiesAndAbsentProperties) {
+    std::vector<std::unique_ptr<Rule>> rules = load_rules({"test/resources/examples_valid.yaml"});
+    ASSERT_NO_THROW(RuleValidation::validate_examples(rules));
+}
+
+TEST(testYamlExamples, testExampleMustMatchItsEnclosingPattern) {
+    std::vector<std::unique_ptr<Rule>> rules = load_rules({"test/resources/invalid_example_exact_pattern.yaml"});
+    ASSERT_THROW(RuleValidation::validate_examples(rules), Exception::ExampleMessageDoesntMatch);
+}
+
+TEST(testYamlExamples, testExamplePropertyExpectationsAreValidated) {
+    std::vector<std::unique_ptr<Rule>> rules = load_rules({"test/resources/invalid_example_property.yaml"});
+    ASSERT_THROW(RuleValidation::validate_examples(rules), Exception::ExampleMessageDoesntMatch);
+}
+
+TEST(testYamlExamples, testExamplesDetectCrossRuleConflicts) {
+    std::vector<std::unique_ptr<Rule>> rules = load_rules({
+        "test/resources/examples_valid.yaml",
+        "test/resources/examples_conflicting_rule.yaml"
+    });
+    ASSERT_THROW(RuleValidation::validate_examples(rules), Exception::ExampleMessageDoesntMatch);
+}
+
+TEST(testRuleLoader, testLoadRulesLoadsAndValidatesDirectory) {
+    ASSERT_NO_THROW({
+        std::vector<std::unique_ptr<Rule>> rules = RuleLoader::load_rules("test/resources/rule_loader_valid");
+        ASSERT_EQ(rules.size(), 1u);
+    });
+}
+
+TEST(testRuleLoader, testLoadRulesRejectsConflictingDirectory) {
+    ASSERT_THROW(
+        RuleLoader::load_rules("test/resources/rule_loader_conflict"),
+        Exception::General
+    );
+}
+
+TEST(testRuleLoader, testLoadRulesLoadsBundledRulesDirectory) {
+    ASSERT_NO_THROW({
+        std::vector<std::unique_ptr<Rule>> rules = RuleLoader::load_rules("rules");
+        ASSERT_EQ(rules.size(), 2u);
+    });
 }
 
 TEST(testYamlErrors, testInvalidDynamicExpressionThrows) {

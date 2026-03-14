@@ -130,44 +130,6 @@ static bool read_logfiles(std::string dir,std::vector<std::string>& messages) {
 	return messages.size() > 0;
 }
 
-
-/**
- * @brief read and process all rules
- *
- * @param dir
- * @param rules
- * @return true
- * @return false
- */
-static bool read_rules(std::string dir,std::vector<std::unique_ptr<Rule>>& rules) {
-	// Find all the YAML config files
-	std::string cmd("find ");
-	cmd.append(dir).append(" -name '*.yaml'");
-	std::string result = exec(cmd.c_str());
-
-	// Read in the YAML config files ad build the rules
-	std::istringstream iss(result);
-
-	for (std::string file; std::getline(iss, file); )
-	{
-		YamlFile fl(file);
-
-		try {
-			fl.readFile();
-		}
-		catch(Exception::Generic& e) {
-			std::string str = e.what();
-			std::cerr << "Exception trying to read [file " << file << " / exception " << str << "]" << std::endl;
-			return false;
-		}
-
-		std::unique_ptr<Rule> rule = fl.getRule();
-		rules.push_back(std::move(rule));
-	}
-
-	return true;
-}
-
 /**
  * @brief Structure for Hyperscan matches
  *
@@ -346,7 +308,11 @@ int main(int argc, const char ** argv)
 
 
 	std::vector<std::unique_ptr<Rule>> rules;
-	if(!read_rules(dir,rules)) {
+	try {
+		rules = RuleLoader::load_rules(dir);
+	}
+	catch(Exception::Generic& e) {
+		std::cerr << e.what() << std::endl;
 		std::cerr << "Failed to read rules from [dir " << dir << "]" << std::endl;
 		return -1;
 	}

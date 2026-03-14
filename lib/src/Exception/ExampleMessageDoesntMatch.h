@@ -8,8 +8,8 @@ namespace Exception {
 
 class ExampleMessageDoesntMatch : public Exception::Generic {
 public:
-    ExampleMessageDoesntMatch(std::string id)
-        : Generic("Not a valid capture group [" + id + "]") {}
+    explicit ExampleMessageDoesntMatch(std::string message)
+        : Generic(std::move(message)) {}
     const char * what() const throw () {
         return Generic::what();
     }

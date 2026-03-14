@@ -17,6 +17,8 @@ public:
     std::string id() {return mId;}
     std::string name() {return mName;}
     Pattern* matched() {return mMatched;}
+    std::vector<Pattern>& patterns() {return mPatterns;}
+    const std::vector<Pattern>& patterns() const {return mPatterns;}
 
     std::vector<std::string> get_anchor_regex();
 

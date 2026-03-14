@@ -9,6 +9,7 @@
 #include "src/Framework/Pattern.h"
 #include "src/Framework/Regex.h"
 #include "src/Framework/RootPath.h"
+#include "src/Framework/RuleValidator.h"
 #include "src/Framework/Span.h"
 #include "src/Framework/Token.h"
 #include "src/Framework/ValueType.h"
@@ -16,3 +17,4 @@
 #include "src/Output/Output.h"
 #include "src/Utils/Utils.h"
 #include "src/YAML/YamlFile.h"
+#include "src/YAML/RuleLoader.h"

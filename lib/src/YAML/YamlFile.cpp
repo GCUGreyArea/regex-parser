@@ -9,6 +9,18 @@
 #include "Exception/Exceptions.h"
 #include "Utils/Utils.h"
 
+namespace {
+
+std::string node_to_string(const YAML::Node& node)
+{
+    if (!node || !node.IsScalar())
+        throw Exception::General("Expected scalar value in example validation block");
+
+    return node.Scalar();
+}
+
+} // namespace
+
 void YamlFile::readFile()
 {
     mFileNode = YAML::LoadFile(mFileName);
@@ -43,7 +55,6 @@ void YamlFile::readFile()
         ptd.name = pattern["name"].as<std::string>();
         ptd.precedence = pattern["precedence"].as<size_t>();
         ptd.type = pattern["type"].as<std::string>();
-        ptd.example = pattern["example"].as<std::string>();
         ptd.match_type = pattern["match"].as<std::string>();
 
         if (ptd.type == "root")
@@ -147,6 +158,8 @@ void YamlFile::readFile()
         }
 
         rd.patterns.emplace(ptd.id, ptd);
+
+        parse_examples(pattern, rd.patterns.at(ptd.id));
     }
 
     // Iterate through the anchors
@@ -310,6 +323,10 @@ std::shared_ptr<Pattern> YamlFile::build_pattern(std::string id, RuleDesc &rd)
     // TODO: Make this into a builder?
     auto p = std::make_shared<Pattern>(ptn.name, ptn.id, *aptn, tokens, asserts, properties, ptn.precedence, type);
 
+    for (const auto& example : ptn.examples) {
+        p->add_example(example);
+    }
+
     for(auto ds : ptn.dynamic) {
         p->add_conditional_assignment(ds);
     }
@@ -322,20 +339,15 @@ std::shared_ptr<Pattern> YamlFile::build_pattern(std::string id, RuleDesc &rd)
  *
  * @param patterns
  */
-void YamlFile::sort_patterns(std::vector<Pattern> patterns)
+void YamlFile::sort_patterns(std::vector<Pattern>& patterns)
 {
-    std::sort(patterns.begin(), patterns.end(), [](Pattern &lhs, Pattern &rhs)
+    std::sort(patterns.begin(), patterns.end(), [](const Pattern& lhs, const Pattern& rhs)
               {
-        if(lhs.num_tokens() == rhs.num_tokens()) {
-            if(lhs.precedence() > rhs.precedence()){
-                return false;
-            }
-        }
-        else if(lhs.num_tokens() < rhs.num_tokens()){
-            return false;
+        if(lhs.num_tokens() != rhs.num_tokens()) {
+            return lhs.num_tokens() > rhs.num_tokens();
         }
 
-        return true; });
+        return lhs.precedence() < rhs.precedence(); });
 }
 
 /**
@@ -345,4 +357,78 @@ void YamlFile::sort_patterns(std::vector<Pattern> patterns)
 std::shared_ptr<ConditionalAssignment> YamlFile::parse_expression(std::string dynamic, RuleDesc &rd)
 {
     return DynamicProperty::compile(dynamic, rd.tk_obj_map);
+}
+
+void YamlFile::parse_examples(const YAML::Node& pattern, RuleDesc::PatternDesc& ptd)
+{
+    auto parse_example_node = [&](const YAML::Node& example_node) {
+        PatternExample example = {};
+
+        if (example_node.IsScalar())
+        {
+            example.message = example_node.as<std::string>();
+            ptd.examples.push_back(example);
+            return;
+        }
+
+        if (!example_node.IsMap())
+            throw Exception::General("Pattern example must be a scalar or map");
+
+        YAML::Node message = example_node["message"];
+        if (!message)
+            throw Exception::General("Pattern example map must declare a message");
+
+        example.message = message.as<std::string>();
+
+        YAML::Node expect = example_node["expect"];
+        if (expect)
+        {
+            YAML::Node tokens = expect["tokens"];
+            if (tokens)
+            {
+                for (YAML::const_iterator it = tokens.begin(); it != tokens.end(); ++it)
+                {
+                    example.expected_tokens.emplace(it->first.as<std::string>(), node_to_string(it->second));
+                }
+            }
+
+            YAML::Node properties = expect["properties"];
+            if (properties)
+            {
+                for (YAML::const_iterator it = properties.begin(); it != properties.end(); ++it)
+                {
+                    example.expected_properties.emplace(it->first.as<std::string>(), node_to_string(it->second));
+                }
+            }
+
+            YAML::Node absent_properties = expect["absent_properties"];
+            if (absent_properties)
+            {
+                for (YAML::const_iterator it = absent_properties.begin(); it != absent_properties.end(); ++it)
+                {
+                    example.absent_properties.push_back(it->as<std::string>());
+                }
+            }
+        }
+
+        ptd.examples.push_back(example);
+    };
+
+    YAML::Node example = pattern["example"];
+    if (example && !example.IsNull())
+    {
+        parse_example_node(example);
+    }
+
+    YAML::Node examples = pattern["examples"];
+    if (examples && !examples.IsNull())
+    {
+        if (!examples.IsSequence())
+            throw Exception::General("Pattern examples must be a sequence");
+
+        for (YAML::const_iterator it = examples.begin(); it != examples.end(); ++it)
+        {
+            parse_example_node(*it);
+        }
+    }
 }

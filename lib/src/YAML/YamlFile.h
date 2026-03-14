@@ -33,7 +33,6 @@ private:
             std::string name;
             size_t precedence;
             std::string type;
-            std::string example;
             std::string extends;
             std::string anchor;
             std::vector<std::string> tokens;
@@ -41,6 +40,7 @@ private:
             std::map<std::string,std::string> asserts;     //! token to asserted value map
             std::vector<PropDesc> properties;
             std::vector<std::shared_ptr<ConditionalAssignment>> dynamic;
+            std::vector<PatternExample> examples;
         };
 
         struct TokenDesc {
@@ -69,8 +69,9 @@ private:
     void build_pattern_tokens(RuleDesc::PatternDesc& p, RuleDesc& rd, std::vector<std::shared_ptr<Token>>& tokens);
     void build_pattern_properties(RuleDesc::PatternDesc& p, RuleDesc &rd, std::vector<Property> &properties);
     std::shared_ptr<Pattern> build_pattern(std::string id, RuleDesc& rdp);
-    void sort_patterns(std::vector<Pattern> patterns);
+    void sort_patterns(std::vector<Pattern>& patterns);
     std::shared_ptr<ConditionalAssignment> parse_expression(std::string dynamic, RuleDesc &rd);
+    void parse_examples(const YAML::Node& pattern, RuleDesc::PatternDesc& ptd);
 
     YAML::Node mFileNode;
     std::string mFileName;
