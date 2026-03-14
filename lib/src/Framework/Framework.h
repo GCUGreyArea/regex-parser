@@ -7,7 +7,7 @@
 #include "ValueType.h"
 #include "Variable.h"
 #include "ConditionalAssignment.h"
-#include "BaseProperty.h"
+#include "ResolvedProperty.h"
 
 
 #endif//FRAMEWORK_H

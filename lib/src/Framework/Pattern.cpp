@@ -10,7 +10,7 @@ Pattern::Pattern(std::string name, std::string id, AnchorPattern& anchor, size_t
     , mMatched(false)
     , mMatchType(Match::Type::SEQUENTIAL) {}
 
-Pattern::Pattern(std::string name, std::string id, AnchorPattern& anchor, std::vector<std::shared_ptr<Token>> tokens, std::vector<std::string> asserts, std::vector<std::shared_ptr<BaseProperty>> properties, size_t precedence, Match::Type type)
+Pattern::Pattern(std::string name, std::string id, AnchorPattern& anchor, std::vector<std::shared_ptr<Token>> tokens, std::vector<std::string> asserts, std::vector<Property> properties, size_t precedence, Match::Type type)
     : mName(name)
     , mId(id)
     , mPrecedence(precedence)
@@ -95,6 +95,7 @@ void Pattern::validate() {
 void Pattern::reset() {
     mMatched = false;
     mAnchor.reset();
+
     for(auto& t : mTokens)
         t->reset();
 }

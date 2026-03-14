@@ -11,13 +11,13 @@
 #include "AnchorPattern.h"
 #include "Token.h"
 #include "Property.h"
-#include "BaseProperty.h"
 #include "ConditionalAssignment.h"
+#include "ResolvedProperty.h"
 
 class Pattern {
 public:
     Pattern(std::string name, std::string id, AnchorPattern& anchor, size_t precedence);
-    Pattern(std::string name, std::string id, AnchorPattern& anchor, std::vector<std::shared_ptr<Token>> tokens, std::vector<std::string> asserts, std::vector<std::shared_ptr<BaseProperty>> properties, size_t precedence, Match::Type type);
+    Pattern(std::string name, std::string id, AnchorPattern& anchor, std::vector<std::shared_ptr<Token>> tokens, std::vector<std::string> asserts, std::vector<Property> properties, size_t precedence, Match::Type type);
 
 
     void add_token(std::string name, std::string ptn, ValueType type, size_t idx);
@@ -28,16 +28,16 @@ public:
     bool match(Match& m, bool anchor = true);
     std::vector<std::shared_ptr<Token>>& get_tokens() {return mTokens;}
 
-    std::vector<std::shared_ptr<BaseProperty>> get_properties() {
-        std::vector<std::shared_ptr<BaseProperty>> props{};
+    std::vector<ResolvedProperty> get_properties() {
+        std::vector<ResolvedProperty> props{};
 
         for( auto& p : mProperties) {
-            props.push_back(p);
+            props.push_back(p.resolve());
         }
 
         for(auto dn : mDynamics) {
             if(dn->evaluate()) {
-                auto vec = dn->get_results();
+                const auto& vec = dn->get_results();
                 for(auto d : vec) {
                     props.push_back(d);
                 }
@@ -71,7 +71,7 @@ private:
     std::vector<std::string> mTkAsserts;
     bool mMatched;
     Match::Type mMatchType;
-    std::vector<std::shared_ptr<BaseProperty>> mProperties;
+    std::vector<Property> mProperties;
     std::vector<std::shared_ptr<ConditionalAssignment>> mDynamics;
 
 };

@@ -203,7 +203,7 @@ std::unique_ptr<AnchorPattern> YamlFile::build_anchor(std::string id, RuleDesc &
 }
 
 
-void YamlFile::build_pattern_properties(RuleDesc::PatternDesc& p, RuleDesc &rd, std::vector<std::shared_ptr<BaseProperty>> &properties, std::vector<std::shared_ptr<ConditionalAssignment>>& assignments)
+void YamlFile::build_pattern_properties(RuleDesc::PatternDesc& p, RuleDesc &rd, std::vector<Property> &properties)
 {
     for (auto& prop : p.properties)
     {
@@ -219,9 +219,7 @@ void YamlFile::build_pattern_properties(RuleDesc::PatternDesc& p, RuleDesc &rd, 
                 tokens.push_back(toit->second);
             }
 
-            std::shared_ptr<BaseProperty> base = std::make_shared<Property>(tokens, prop.name, prop.delim);
-            rd.prop_obj_map.emplace(base->name(),base);
-            properties.push_back(base);
+            properties.emplace_back(tokens, prop.name, prop.delim);
 
             continue;
         }
@@ -279,12 +277,11 @@ std::shared_ptr<Pattern> YamlFile::build_pattern(std::string id, RuleDesc &rd)
     std::unique_ptr<AnchorPattern> aptn = build_anchor(ptn.anchor, rd);
 
     std::vector<std::shared_ptr<Token>> tokens = {};
-    std::vector<std::shared_ptr<BaseProperty>> properties {};
-    std::vector<std::shared_ptr<ConditionalAssignment>> assignments {};
+    std::vector<Property> properties {};
     std::vector<size_t> token_idx = {};
 
     build_pattern_tokens(ptn, rd, tokens);
-    build_pattern_properties(ptn, rd, properties, assignments);
+    build_pattern_properties(ptn, rd, properties);
 
     Match::Type type = Match::Type::NONE;
 

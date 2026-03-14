@@ -5,7 +5,6 @@
 #include <iostream>
 #include "Exception/Exceptions.h"
 #include "BaseValue.h"
-#include "BaseProperty.h"
 
 
 class Variable {

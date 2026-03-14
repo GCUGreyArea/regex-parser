@@ -60,7 +60,6 @@ private:
         std::map<std::string, TokenDesc> tokens;        //! map of token dec by name
         std::map<std::string, AnchorDesc> anchors;      //! map of anchors by name
         std::map<std::string,std::shared_ptr<Token>> tk_obj_map; //! Token objects by name
-        std::map<std::string,std::shared_ptr<BaseProperty>> prop_obj_map; //! Map of all properties
         std::vector<std::shared_ptr<Token>> tk_obj_list;
         std::string id;     //! The name of the rule
         std::string name;   //! the id of the rule
@@ -68,7 +67,7 @@ private:
 
     std::unique_ptr<AnchorPattern> build_anchor(std::string id, RuleDesc& rdp);
     void build_pattern_tokens(RuleDesc::PatternDesc& p, RuleDesc& rd, std::vector<std::shared_ptr<Token>>& tokens);
-    void build_pattern_properties(RuleDesc::PatternDesc& p, RuleDesc &rd, std::vector<std::shared_ptr<BaseProperty>> &properties, std::vector<std::shared_ptr<ConditionalAssignment>>& assignments);
+    void build_pattern_properties(RuleDesc::PatternDesc& p, RuleDesc &rd, std::vector<Property> &properties);
     std::shared_ptr<Pattern> build_pattern(std::string id, RuleDesc& rdp);
     void sort_patterns(std::vector<Pattern> patterns);
     std::shared_ptr<ConditionalAssignment> parse_expression(std::string dynamic, RuleDesc &rd);

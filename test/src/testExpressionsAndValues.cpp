@@ -600,11 +600,11 @@ TEST(testExpressionsAndValues, testConditionalAssignmentAssignsValues) {
 
         ca.evaluate();
 
-        std::vector<std::shared_ptr<BaseProperty>> values = ca.get_results();
+        std::vector<ResolvedProperty> values = ca.get_results();
 
 
-        ASSERT_EQ(values[0]->name(),"sum");
-        ASSERT_EQ(values[0]->value(),"active.2048");
+        ASSERT_EQ(values[0].name,"sum");
+        ASSERT_EQ(values[0].value,"active.2048");
     }
     else {
         ASSERT_FALSE(true);

@@ -30,9 +30,9 @@ public:
                 }
             }
 
-            std::vector<std::shared_ptr<BaseProperty>> properties = p->get_properties();
+            std::vector<ResolvedProperty> properties = p->get_properties();
             for(auto& p : properties) {
-                mOut["parsed"][mIdx]["property"][p->name()] = p->value();
+                mOut["parsed"][mIdx]["property"][p.name] = p.value;
             }
 
         }
